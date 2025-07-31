@@ -2,8 +2,8 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../database');
 
 module.exports = (sequelize, DataTypes) => {
-  const Attachment = sequelize.define('Attachment', {
-    attachment_id: {
+  const ServiceOrderAssignment = sequelize.define('ServiceOrderAssignment', {
+    assignment_id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
@@ -12,21 +12,28 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    file_path: {
-      type: DataTypes.STRING(255),
+    employees_id: {
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
-    file_type: {
-      type: DataTypes.ENUM('image', 'document', 'audio'),
+    role_in_order: {
+      type: DataTypes.STRING(50),
     },
-    uploaded_at: {
+    assigned_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
     },
+    unassigned_at: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    notes: {
+      type: DataTypes.TEXT,
+    },
   }, {
-    tableName: 'attachments',
+    tableName: 'service_order_assignments',
     timestamps: false,
   });
 
-  return Attachment;
+  return ServiceOrderAssignment;
 };
