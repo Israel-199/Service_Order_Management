@@ -1,6 +1,15 @@
 const serviceOrderService = require('../services/serviceOrderService');
 
+
 class ServiceOrderController {
+  async getAllServiceOrders(req, res, next) {
+    try {
+      const result = await serviceOrderService.getAllServiceOrders(req.query);
+      res.json(result);
+    } catch (err) {
+      next(err);
+    }
+  }
     async createServiceOrder(req, res, next) {
         try {
             const data = req.body;

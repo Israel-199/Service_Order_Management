@@ -6,8 +6,7 @@ const authRoutes = require('./routes/authRoutes');
 
 const app = express();
 // Enable JSON body parsing
-app.use(express.json());
-
+app.use(express.json()); 
 app.use(cors());
 app.use('/api', apiRouter);
 app.use('/api', authRoutes);

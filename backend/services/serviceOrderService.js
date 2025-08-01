@@ -9,19 +9,15 @@ class ServiceOrderService {
     const {
       limit,
       offset,
-      sortBy = 'created_at',
-      sortOrder = 'DESC',
-      page,
+      sortBy,
+      sortOrder,
+      page
     } = parsePagination(query);
 
     const search = query.search || query.q || null;
 
     const whereClause = search
-      ? buildSearchCondition(search, [
-          'description',
-          'status',
-          'priority',
-        ])
+      ? buildSearchCondition(search, ['description', 'status', 'priority'], Sequelize)
       : {};
 
     const { rows: orders, count: total } = await ServiceOrder.findAndCountAll({

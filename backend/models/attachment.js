@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
     file_type: {
       type: DataTypes.ENUM('image', 'document', 'audio'),
     },
-    uploaded_at: {
+    created_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
     },
