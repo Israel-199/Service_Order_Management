@@ -2,8 +2,16 @@
 
 const customerService = require('../services/customerService');
 const { validationResult } = require('express-validator');
+/**
+ //CustomerController handles customer-related requests
+ // It includes methods for getting all customers, getting a customer by ID,
+ // creating a new customer, updating an existing customer, and deleting a customer.
+ // Each method interacts with the customerService for business logic and returns JSON responses.
+ // The controller is used in the customerRoutes file to define the routes.
+*/
 
-class CustomerController {
+class CustomerController {  
+  // GET /customers
   async getAllCustomers(req, res, next) {
     try {
       const result = await customerService.getAllCustomers(req.query);
@@ -13,6 +21,7 @@ class CustomerController {
     }
   }
 
+  // GET /customers/:customer_id
   async getCustomerById(req, res, next) {
     try {
       const customer = await customerService.getCustomerById(req.params.customer_id);
@@ -25,6 +34,7 @@ class CustomerController {
     }
   }
 
+  // POST /customers
   async createCustomer(req, res, next) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -37,7 +47,8 @@ class CustomerController {
       next(error);
     }
   }
-
+ 
+  // PUT /customers/:customer_id
   async updateCustomer(req, res, next) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -51,12 +62,87 @@ class CustomerController {
     }
   }
 
+  // DELETE /customers/:customer_id
   async deleteCustomer(req, res, next) {
     try {
       await customerService.deleteCustomer(req.params.customer_id);
       res.status(200).json({ message: 'Customer deleted successfully' });
     } catch (error) {
       next(error);
+    }
+  }
+
+  async getCustomersByName(req, res, next) {
+    try {
+      const data = await customerService.getCustomersByName(req.params.name, req.query);
+      res.status(200).json({ message: 'Customers fetched by name', ...data });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getCustomersByEmail(req, res, next) {
+    try {
+      const data = await customerService.getCustomersByEmail(req.params.email, req.query);
+      res.status(200).json({ message: 'Customers fetched by email', ...data });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getCustomersByPhone(req, res, next) {
+    try {
+      const data = await customerService.getCustomersByPhone(req.params.phone, req.query);
+      res.status(200).json({ message: 'Customers fetched by phone', ...data });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getCustomersByCompany(req, res, next) {
+    try {
+      const data = await customerService.getCustomersByCompany(req.params.company, req.query);
+      res.status(200).json({ message: 'Customers fetched by company', ...data });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getCustomersByAddress(req, res, next) {
+    try {
+      const data = await customerService.getCustomersByAddress(req.params.address, req.query);
+      res.status(200).json({ message: 'Customers fetched by address', ...data });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getCustomersByTinNumber(req, res, next) {
+    try {
+      const data = await customerService.getCustomersByTinNumber(req.params.tinNumber, req.query);
+      res.status(200).json({ message: 'Customers fetched by TIN number', ...data });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+
+  async getCustomerOrders(req, res, next) {
+    try {
+      const customerId = req.params.customerId;
+      const orders = await customerService.getCustomerOrders(customerId);
+      res.status(200).json({
+        message: 'Customer orders fetched successfully',
+        data: orders,
+      });
+    } catch (error) {
+      if (error.message === 'Invalid customer ID') {
+        return res.status(400).json({ error: error.message });
+      }
+      if (error.message === 'Customer not found') {
+        return res.status(404).json({ error: error.message });
+      }
+      next(error); // Pass other errors to error-handling middleware
     }
   }
 }

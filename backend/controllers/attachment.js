@@ -1,8 +1,14 @@
 // controllers/attachment.js
 const attachmentService = require('../services/attachmentService');
 
+/**
+ * AttachmentController handles attachment-related requests for service orders.
+ * It includes methods for creating, retrieving, updating, and deleting attachments.
+ * Each method interacts with the attachmentService for business logic and returns JSON responses.
+ * The controller is used in the attachmentRoutes file to define the routes.
+ */
 class AttachmentController {
-  // POST /service-orders/:order_id/attachments
+
   async createAttachmentForOrder(req, res, next) {
     try {
       const orderId = req.params.order_id;
@@ -14,7 +20,6 @@ class AttachmentController {
     }
   }
 
-  // GET /service-orders/:order_id/attachments
   async getAllAttachmentsForOrder(req, res, next) {
     try {
       const orderId = req.params.order_id;
@@ -28,7 +33,6 @@ class AttachmentController {
     }
   }
 
-  // GET /service-orders/:order_id/attachments/:id
   async getAttachmentByIdForOrder(req, res, next) {
     try {
       const { order_id: orderId, id } = req.params;
@@ -42,7 +46,6 @@ class AttachmentController {
     }
   }
 
-  // PUT /service-orders/:order_id/attachments/:id
   async updateAttachmentForOrder(req, res, next) {
     try {
       const { order_id: orderId, id } = req.params;
@@ -58,7 +61,6 @@ class AttachmentController {
     }
   }
 
-  // DELETE /service-orders/:order_id/attachments/:id
   async deleteAttachmentForOrder(req, res, next) {
     try {
       const { order_id: orderId, id } = req.params;

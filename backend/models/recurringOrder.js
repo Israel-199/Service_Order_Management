@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    recurrence_type: {
+    frequency: {
       type: DataTypes.ENUM('daily', 'weekly', 'monthly'),
     },
     next_due_date: {
@@ -20,6 +20,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     end_date: {
       type: DataTypes.DATE,
+      allowNull: false,
     },
     created_at: {
       type: DataTypes.DATE,

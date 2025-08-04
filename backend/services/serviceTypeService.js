@@ -1,8 +1,13 @@
-const { ServiceType } = require('../models');
 const { Op } = require('sequelize');
+const { Employee, Customer, ServiceType } = require('../models'); // Assuming these models are defined
+const { parsePagination } = require('../utils/pagination');
+const { buildSearchCondition } = require('../utils/search'); 
+// const { Category } = require('../models'); // Assuming Category model is defined
+
+
 
 class ServiceTypeService {
-  // Create new service type
+  // Create a new service type
   async createServiceType(data) {
     return await ServiceType.create(data);
   }
@@ -14,34 +19,45 @@ class ServiceTypeService {
     return await serviceType.update(updateData);
   }
 
+  // Delete a service type by ID
+  async deleteServiceType(serviceTypeId) {
+    const serviceType = await ServiceType.findByPk(serviceTypeId);
+    if (!serviceType) throw new Error('Service type not found');
+    await serviceType.destroy();
+    return { message: 'Service type deleted successfully' };
+  }
+
   // Get all service types with pagination, search, and sorting
-  async getAllServiceTypes({ limit, offset, order, search }) {
+  async getAllServiceTypes(queryParams) {
+    const { limit, offset, order, page } = parsePagination(queryParams);
+    const search = queryParams.search || queryParams.q || null;
+
     const where = search
       ? {
           [Op.or]: [
             { name: { [Op.iLike]: `%${search}%` } },
-            { slug: { [Op.iLike]: `%${search}%` } }
-          ]
+            { slug: { [Op.iLike]: `%${search}%` } },
+            { description: { [Op.iLike]: `%${search}%` } },
+          ],
         }
       : {};
 
     const { count, rows } = await ServiceType.findAndCountAll({
       where,
+      order,
       limit,
       offset,
-      order
     });
 
     return {
-      total: count,
-      page: Math.floor(offset / limit) + 1,
-      service_types: rows
+      service_types: rows,
+      pagination: {
+        total: count,
+        page,
+        limit,
+        totalPages: Math.ceil(count / limit),
+      },
     };
-  }
-
-  // Get single service type by ID
-  async getServiceTypeById(id) {
-    return await ServiceType.findByPk(id);
   }
 }
 

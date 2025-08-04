@@ -1,9 +1,7 @@
-// models/index.js
-
 const fs = require('fs');
 const path = require('path');
 const Sequelize = require('sequelize');
-const sequelize = require('../database'); // ✅ Sequelize instance
+const sequelize = require('../database'); // Sequelize instance
 
 const db = { sequelize, Sequelize };
 
@@ -30,6 +28,7 @@ const {
   ServiceOrderItem,
   ServiceOrderAssignment,
   ServiceOrderStatusHistory,
+  TechnicianServiceType,
 } = db;
 
 // 3. Define associations between models
@@ -68,25 +67,29 @@ if (ServiceOrder && RecurringOrder) {
 }
 
 // Employee ↔ ServiceType (Many-to-Many via technician_service_types)
-if (Employee && ServiceType) {
+if (Employee && ServiceType && TechnicianServiceType) {
   Employee.belongsToMany(ServiceType, {
-    through: 'technician_service_types',
-    foreignKey: 'technician_id',
+    through: TechnicianServiceType,
+    foreignKey: 'lead_employees_id',
     otherKey: 'service_type_id',
   });
-
   ServiceType.belongsToMany(Employee, {
-    through: 'technician_service_types',
+    through: TechnicianServiceType,
     foreignKey: 'service_type_id',
-    otherKey: 'technician_id',
+    otherKey: 'lead_employees_id',
   });
+}
+
+// TechnicianServiceType associations
+if (TechnicianServiceType && Employee && ServiceType) {
+  TechnicianServiceType.belongsTo(Employee, { foreignKey: 'lead_employees_id' });
+  TechnicianServiceType.belongsTo(ServiceType, { foreignKey: 'service_type_id' });
 }
 
 // ServiceOrder ↔ ServiceOrderItem ↔ ServiceType
 if (ServiceOrder && ServiceOrderItem && ServiceType) {
   ServiceOrder.hasMany(ServiceOrderItem, { foreignKey: 'order_id' });
   ServiceOrderItem.belongsTo(ServiceOrder, { foreignKey: 'order_id' });
-
   ServiceType.hasMany(ServiceOrderItem, { foreignKey: 'service_type_id' });
   ServiceOrderItem.belongsTo(ServiceType, { foreignKey: 'service_type_id' });
 }
@@ -95,16 +98,13 @@ if (ServiceOrder && ServiceOrderItem && ServiceType) {
 if (ServiceOrder && ServiceOrderAssignment && Employee) {
   ServiceOrder.hasMany(ServiceOrderAssignment, { foreignKey: 'order_id' });
   ServiceOrderAssignment.belongsTo(ServiceOrder, { foreignKey: 'order_id' });
-
   Employee.hasMany(ServiceOrderAssignment, { foreignKey: 'employees_id' });
   ServiceOrderAssignment.belongsTo(Employee, { foreignKey: 'employees_id' });
-
   ServiceOrder.belongsToMany(Employee, {
     through: ServiceOrderAssignment,
     foreignKey: 'order_id',
     otherKey: 'employees_id',
   });
-
   Employee.belongsToMany(ServiceOrder, {
     through: ServiceOrderAssignment,
     foreignKey: 'employees_id',
@@ -116,7 +116,6 @@ if (ServiceOrder && ServiceOrderAssignment && Employee) {
 if (ServiceOrder && ServiceOrderStatusHistory && Employee) {
   ServiceOrder.hasMany(ServiceOrderStatusHistory, { foreignKey: 'order_id' });
   ServiceOrderStatusHistory.belongsTo(ServiceOrder, { foreignKey: 'order_id' });
-
   ServiceOrderStatusHistory.belongsTo(Employee, {
     foreignKey: 'changed_by',
     allowNull: true,

@@ -12,5 +12,9 @@ const validateEmployee = [
   body('phone').optional().isString().withMessage('Phone must be a string'),
 ];
 
+const validateTechnicianServiceType = [
+  body('lead_employees_id').isInt().withMessage('Lead employee ID must be an integer'),
+  body('service_type_id').isInt().withMessage('Service type ID must be an integer'),
+];
 
-module.exports = { validateCustomer, validateEmployee };
+module.exports = { validateCustomer, validateEmployee, validateTechnicianServiceType };

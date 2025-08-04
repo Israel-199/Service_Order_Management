@@ -1,4 +1,6 @@
 // models/Employee.js
+const { DataTypes } = require('sequelize');
+const sequelize = require('../database');
 module.exports = (sequelize, DataTypes) => {
   const Employee = sequelize.define('Employee', {
     employees_id: {
@@ -18,10 +20,20 @@ module.exports = (sequelize, DataTypes) => {
     phone: {
       type: DataTypes.STRING
     },
+
     specification: {
       type: DataTypes.ENUM('technician', 'supervisor', 'manager'),
       allowNull: false,
       defaultValue: 'technician'
+    },
+    created_at: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
+    status: {
+      type: DataTypes.ENUM('active', 'inactive'),
+      allowNull: true,
+      defaultValue: 'active'
     }
   }, {
     tableName: 'employees',

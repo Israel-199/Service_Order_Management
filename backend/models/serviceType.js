@@ -1,9 +1,4 @@
 // models/serviceType.js
-
-/**
- * Defines the ServiceType model for managing service types
- */
-
 module.exports = (sequelize, DataTypes) => {
   const ServiceType = sequelize.define('ServiceType', {
     service_type_id: {
