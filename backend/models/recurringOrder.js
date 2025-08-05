@@ -2,8 +2,8 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../database');
 
 module.exports = (sequelize, DataTypes) => {
-  const Attachment = sequelize.define('Attachment', {
-    attachment_id: {
+  const RecurringOrder = sequelize.define('RecurringOrder', {
+    recurring_id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
@@ -12,21 +12,24 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    file_path: {
-      type: DataTypes.STRING(255),
-      allowNull: false,
+    frequency: {
+      type: DataTypes.ENUM('daily', 'weekly', 'monthly'),
     },
-    file_type: {
-      type: DataTypes.ENUM('image', 'document', 'audio'),
+    next_due_date: {
+      type: DataTypes.DATE,
+    },
+    end_date: {
+      type: DataTypes.DATE,
+      allowNull: false,
     },
     created_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
     },
   }, {
-    tableName: 'attachments',
+    tableName: 'recurring_orders',
     timestamps: false,
   });
 
-  return Attachment;
+  return RecurringOrder;
 };

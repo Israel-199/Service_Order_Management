@@ -1,29 +1,14 @@
-require("dotenv").config(); 
-require('colors');
-const app = require("./app.js");
-const sequelize = require("./config/database");
-const customerRoutes = require('./routes/customerRoutes.js'); 
-const authRoutes = require('./routes/authRoutes.js')
+require('dotenv').config();
+const http = require('http');
+const app = require('./app');
+const sequelize = require('./database');
+const port = process.env.PORT || 3000;
 
+sequelize.authenticate()
+  .then(() => console.log('Database connected'))
+  .catch(err => console.error('Database connection error:', err));
 
-app.use('/api/customers', customerRoutes);
-app.use('/api/auth', authRoutes);
-
-const PORT = process.env.PORT || 3000;
-
-(async () => {
-  try {
-    await sequelize.authenticate();
-    console.log("MySQL Database connected successfully.".bgGreen);
-    await sequelize.sync();
-
-    app.listen(PORT, () => {
-      console.log(` Server running on http://localhost:${PORT}`);
-    });
-  } catch (error) {
-    console.error(" DB connection failed:".bgRed, error.message);
-  }
-})();
-
-
-
+const server = http.createServer(app);
+server.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+});
