@@ -11,7 +11,7 @@ const { auth } = require('../middleware/auth');
 router.post('/login', (req, res) => {
   const { email, password } = req.body;
 
-  // Validate request
+  // Validate input
   if (!email || !password) {
     return res.status(400).json({
       error: 'Bad Request',
@@ -19,35 +19,39 @@ router.post('/login', (req, res) => {
     });
   }
 
-  // Compare credentials with environment variables
-  if (
-    email !== process.env.ADMIN_EMAIL ||
-    password !== process.env.ADMIN_PASSWORD
-  ) {
+  // Authenticate credentials
+  const isEmailValid = email === process.env.ADMIN_EMAIL;
+  const isPasswordValid = password === process.env.ADMIN_PASSWORD;
+
+  if (!isEmailValid || !isPasswordValid) {
     return res.status(401).json({
       error: 'Unauthorized',
       message: 'Invalid email or password',
     });
   }
 
-  // Create JWT token payload with admin metadata
-  const tokenPayload = {
+  // Construct token payload
+  const payload = {
     email,
     username: process.env.ADMIN_USERNAME,
     userid: process.env.ADMIN_USERID,
     role: 'admin',
   };
 
-  // Sign the JWT with expiration
-  const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, {
+  // Generate JWT
+  const token = jwt.sign(payload, process.env.JWT_SECRET, {
     expiresIn: '3h',
   });
 
-  // Respond with token and user info
-  return res.status(200).json({
+  res.status(200).json({
     message: 'Login successful',
     token,
-    ...tokenPayload,
+    user: {
+      username: payload.username,
+      userid: payload.userid,
+      email: payload.email,
+      role: payload.role,
+    },
   });
 });
 
@@ -57,11 +61,15 @@ router.post('/login', (req, res) => {
  * @access Protected (admin only)
  */
 router.get('/checkUser', auth, (req, res) => {
+  const { username, userid, role } = req.user;
+
   res.status(200).json({
     message: 'Valid user',
-    username: req.user.username,
-    userid: req.user.userid,
-    is_admin: req.user.role === 'admin',
+    user: {
+      username,
+      userid,
+      is_admin: role === 'admin',
+    },
   });
 });
 

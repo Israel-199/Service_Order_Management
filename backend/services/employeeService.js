@@ -5,11 +5,28 @@ const { buildSearchCondition } = require('../utils/search');
 const { Op } = Sequelize;
 
 class EmployeeService {
+  _throwError(message, statusCode = 404) {
+    const error = new Error(message);
+    error.statusCode = statusCode;
+    throw error;
+  }
+
+  async _getEmployeeOrThrow(id) {
+    const employee = await Employee.findByPk(id, {
+      attributes: [
+        ['employees_id', 'id'],
+        'name',
+        'email',
+        'phone',
+        'specification',
+      ],
+    });
+    if (!employee) this._throwError('Employee not found');
+    return employee;
+  }
+
   /**
-   * Fetch paginated/sorted/searched employees.
-   * Query params supported:
-   *  - page, limit, sortBy, sortOrder
-   *  - search (free-text search)
+   * Fetch paginated, sorted, and searched employees
    */
   async getAllEmployees(query) {
     const {
@@ -21,13 +38,12 @@ class EmployeeService {
     } = parsePagination(query);
 
     const search = query.search || query.q || null;
-
-    const whereClause = search
+    const where = search
       ? buildSearchCondition(['name', 'email', 'phone', 'specification'], search)
       : {};
 
     const { rows: employees, count: total } = await Employee.findAndCountAll({
-      where: whereClause,
+      where,
       attributes: [
         ['employees_id', 'id'],
         'name',
@@ -52,30 +68,22 @@ class EmployeeService {
   }
 
   async getEmployeeById(id) {
-    return await Employee.findByPk(id, {
-      attributes: [
-        ['employees_id', 'id'],
-        'name',
-        'email',
-        'phone',
-        'specification',
-      ],
-    });
+    return this._getEmployeeOrThrow(id);
   }
 
   async createEmployee(data) {
-    return await Employee.create(data);
+    return Employee.create(data);
   }
 
   async updateEmployee(id, data) {
     const employee = await Employee.findByPk(id);
-    if (!employee) throw new Error('Employee not found');
-    return await employee.update(data);
+    if (!employee) this._throwError('Employee not found');
+    return employee.update(data);
   }
 
   async deleteEmployee(id) {
     const employee = await Employee.findByPk(id);
-    if (!employee) throw new Error('Employee not found');
+    if (!employee) this._throwError('Employee not found');
     await employee.destroy();
     return { message: 'Employee deleted successfully' };
   }

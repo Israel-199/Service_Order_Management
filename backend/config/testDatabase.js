@@ -1,12 +1,21 @@
+
 const sequelize = require('./database');
 
-(async () => {
+/**
+ * Initialize and test database connection.
+ * This will be used during server startup.
+ */
+async function initializeDatabase() {
   try {
     await sequelize.authenticate();
-    console.log('✅ Database connection has been established successfully.');
+    console.log('✅ Database connection established successfully.');
   } catch (error) {
-    console.error('❌ Unable to connect to the database:', error);
-  } finally {
-    await sequelize.close();
+    console.error('❌ Database connection failed:', error.message);
+    process.exit(1); // Stop the app if DB connection fails
   }
-})();
+}
+
+module.exports = {
+  sequelize,
+  initializeDatabase,
+};

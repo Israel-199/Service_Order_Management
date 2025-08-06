@@ -6,10 +6,36 @@ const { Op } = Sequelize;
 
 class CustomerService {
   /**
+   * Utility to throw a structured error
+   */
+  _throwError(message, statusCode = 404) {
+    const err = new Error(message);
+    err.statusCode = statusCode;
+    throw err;
+  }
+
+  /**
+   * Fetch customer by ID or throw error
+   */
+  async _getCustomerOrThrow(id) {
+    const customer = await Customer.findByPk(id, {
+      attributes: [
+        ['customer_id', 'id'],
+        'name',
+        'email',
+        'phone',
+        'company',
+        'address',
+        'tin_number',
+        'created_at',
+      ],
+    });
+    if (!customer) this._throwError('Customer not found');
+    return customer;
+  }
+
+  /**
    * Fetch paginated/sorted/searched customers.
-   * Query params supported:
-   *  - page, limit, sortBy, sortOrder
-   *  - search (free-text search)
    */
   async getAllCustomers(query) {
     const {
@@ -21,13 +47,12 @@ class CustomerService {
     } = parsePagination(query);
 
     const search = query.search || query.q || null;
-
-    const whereClause = search
+    const where = search
       ? buildSearchCondition(['name', 'email', 'company', 'phone'], search)
       : {};
 
     const { rows: customers, count: total } = await Customer.findAndCountAll({
-      where: whereClause,
+      where,
       attributes: [
         ['customer_id', 'id'],
         'name',
@@ -55,33 +80,22 @@ class CustomerService {
   }
 
   async getCustomerById(id) {
-    return await Customer.findByPk(id, {
-      attributes: [
-        ['customer_id', 'id'],
-        'name',
-        'email',
-        'phone',
-        'company',
-        'address',
-        'tin_number',
-        'created_at',
-      ],
-    });
+    return this._getCustomerOrThrow(id);
   }
 
   async createCustomer(data) {
-    return await Customer.create(data);
+    return Customer.create(data);
   }
 
   async updateCustomer(id, data) {
     const customer = await Customer.findByPk(id);
-    if (!customer) throw new Error('Customer not found');
-    return await customer.update(data);
+    if (!customer) this._throwError('Customer not found');
+    return customer.update(data);
   }
 
   async deleteCustomer(id) {
     const customer = await Customer.findByPk(id);
-    if (!customer) throw new Error('Customer not found');
+    if (!customer) this._throwError('Customer not found');
     await customer.destroy();
     return { message: 'Customer deleted successfully' };
   }

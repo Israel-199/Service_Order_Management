@@ -5,23 +5,37 @@ const { buildSearchCondition } = require('../utils/search');
 const { Op } = Sequelize;
 
 class ServiceOrderService {
+  _throwError(message, statusCode = 404) {
+    const error = new Error(message);
+    error.statusCode = statusCode;
+    throw error;
+  }
+
+  async _getOrderOrThrow(id) {
+    const order = await ServiceOrder.findByPk(id);
+    if (!order) this._throwError('Service Order not found');
+    return order;
+  }
+
+  /**
+   * Fetch paginated, sorted, searched service orders
+   */
   async getAllServiceOrders(query) {
     const {
       limit,
       offset,
-      sortBy,
-      sortOrder,
-      page
+      sortBy = 'service_order_id',
+      sortOrder = 'ASC',
+      page,
     } = parsePagination(query);
 
     const search = query.search || query.q || null;
-
-    const whereClause = search
-      ? buildSearchCondition(search, ['description', 'status', 'priority'], Sequelize)
+    const where = search
+      ? buildSearchCondition(['description', 'status', 'priority'], search)
       : {};
 
     const { rows: orders, count: total } = await ServiceOrder.findAndCountAll({
-      where: whereClause,
+      where,
       order: [[sortBy, sortOrder]],
       limit,
       offset,
@@ -39,22 +53,20 @@ class ServiceOrderService {
   }
 
   async getServiceOrderById(id) {
-    return await ServiceOrder.findByPk(id);
+    return this._getOrderOrThrow(id);
   }
 
   async createServiceOrder(data) {
-    return await ServiceOrder.create(data);
+    return ServiceOrder.create(data);
   }
 
   async updateServiceOrder(id, data) {
-    const order = await ServiceOrder.findByPk(id);
-    if (!order) throw new Error('Service Order not found');
-    return await order.update(data);
+    const order = await this._getOrderOrThrow(id);
+    return order.update(data);
   }
 
   async deleteServiceOrder(id) {
-    const order = await ServiceOrder.findByPk(id);
-    if (!order) throw new Error('Service Order not found');
+    const order = await this._getOrderOrThrow(id);
     await order.destroy();
     return { message: 'Service Order deleted successfully' };
   }

@@ -5,7 +5,7 @@ const sequelize = require('./database');
 const port = process.env.PORT || 3000;
 
 sequelize.authenticate()
-  .then(() => console.log('Database connected'))
+  .then(() => console.log('Database connected successfully'))
   .catch(err => console.error('Database connection error:', err));
 
 const server = http.createServer(app);

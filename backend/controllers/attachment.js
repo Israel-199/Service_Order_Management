@@ -1,12 +1,24 @@
-// controllers/attachment.js
 const attachmentService = require('../services/attachmentService');
 
 class AttachmentController {
+  // 🔒 Private method: Validate attachment ownership
+  async #validateAttachmentOwnership(orderId, id, res) {
+    const attachment = await attachmentService.getAttachmentById(id);
+    if (!attachment || attachment.order_id != orderId) {
+      res.status(404).json({
+        error: 'Not Found',
+        message: 'Attachment not found for this order',
+      });
+      return null;
+    }
+    return attachment;
+  }
+
   // POST /service-orders/:order_id/attachments
   async createAttachmentForOrder(req, res, next) {
     try {
-      const orderId = req.params.order_id;
-      const data = { ...req.body, order_id: orderId };
+      const { order_id } = req.params;
+      const data = { ...req.body, order_id };
       const attachment = await attachmentService.createAttachment(data);
       res.status(201).json({ message: 'Attachment created', attachment });
     } catch (err) {
@@ -17,10 +29,10 @@ class AttachmentController {
   // GET /service-orders/:order_id/attachments
   async getAllAttachmentsForOrder(req, res, next) {
     try {
-      const orderId = req.params.order_id;
+      const { order_id } = req.params;
       const result = await attachmentService.getAllAttachments({
         ...req.query,
-        order_id: orderId
+        order_id,
       });
       res.status(200).json({ message: 'Attachments fetched', ...result });
     } catch (err) {
@@ -31,12 +43,10 @@ class AttachmentController {
   // GET /service-orders/:order_id/attachments/:id
   async getAttachmentByIdForOrder(req, res, next) {
     try {
-      const { order_id: orderId, id } = req.params;
-      const att = await attachmentService.getAttachmentById(id);
-      if (!att || att.order_id != orderId) {
-        return res.status(404).json({ error: 'Not Found', message: 'Attachment not found for this order' });
-      }
-      res.json({ message: 'Attachment retrieved', attachment: att });
+      const { order_id, id } = req.params;
+      const attachment = await this.#validateAttachmentOwnership(order_id, id, res);
+      if (!attachment) return;
+      res.json({ message: 'Attachment retrieved', attachment });
     } catch (err) {
       next(err);
     }
@@ -45,12 +55,9 @@ class AttachmentController {
   // PUT /service-orders/:order_id/attachments/:id
   async updateAttachmentForOrder(req, res, next) {
     try {
-      const { order_id: orderId, id } = req.params;
-      // Ensure belongs to this order
-      const att = await attachmentService.getAttachmentById(id);
-      if (!att || att.order_id != orderId) {
-        return res.status(404).json({ error: 'Not Found', message: 'Attachment not found for this order' });
-      }
+      const { order_id, id } = req.params;
+      const attachment = await this.#validateAttachmentOwnership(order_id, id, res);
+      if (!attachment) return;
       const updated = await attachmentService.updateAttachment(id, req.body);
       res.json({ message: 'Attachment updated', attachment: updated });
     } catch (err) {
@@ -61,11 +68,9 @@ class AttachmentController {
   // DELETE /service-orders/:order_id/attachments/:id
   async deleteAttachmentForOrder(req, res, next) {
     try {
-      const { order_id: orderId, id } = req.params;
-      const att = await attachmentService.getAttachmentById(id);
-      if (!att || att.order_id != orderId) {
-        return res.status(404).json({ error: 'Not Found', message: 'Attachment not found for this order' });
-      }
+      const { order_id, id } = req.params;
+      const attachment = await this.#validateAttachmentOwnership(order_id, id, res);
+      if (!attachment) return;
       await attachmentService.deleteAttachment(id);
       res.json({ message: 'Attachment deleted' });
     } catch (err) {

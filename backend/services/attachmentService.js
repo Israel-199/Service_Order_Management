@@ -6,41 +6,55 @@ const { parsePagination } = require('../utils/pagination');
 class AttachmentService {
   static allowedTypes = ['image', 'document', 'audio'];
 
-  async createAttachment(data) {
-    if (!data.order_id) {
-      const err = new Error('order_id is required');
-      err.statusCode = 400;
-      throw err;
-    }
-    const order = await ServiceOrder.findByPk(data.order_id);
-    if (!order) {
-      const err = new Error('Service order not found');
-      err.statusCode = 404;
-      throw err;
-    }
-    if (!data.file_type) {
-      data.file_type = 'document';
-    } else if (!AttachmentService.allowedTypes.includes(data.file_type)) {
-      const err = new Error(
-        `Invalid file_type. Allowed: ${AttachmentService.allowedTypes.join(', ')}`
+  _throwError(message, statusCode = 400) {
+    const error = new Error(message);
+    error.statusCode = statusCode;
+    throw error;
+  }
+
+  _validateFileType(fileType) {
+    if (!AttachmentService.allowedTypes.includes(fileType)) {
+      this._throwError(
+        `Invalid file_type. Allowed: ${AttachmentService.allowedTypes.join(', ')}`,
+        400
       );
-      err.statusCode = 400;
-      throw err;
     }
-    return Attachment.create(data);
+  }
+
+  async _getAttachmentOrThrow(id) {
+    const attachment = await Attachment.findByPk(id);
+    if (!attachment) {
+      this._throwError('Attachment not found', 404);
+    }
+    return attachment;
+  }
+
+  async createAttachment(data) {
+    const { order_id, file_type = 'document' } = data;
+
+    if (!order_id) this._throwError('order_id is required');
+
+    const order = await ServiceOrder.findByPk(order_id);
+    if (!order) this._throwError('Service order not found', 404);
+
+    this._validateFileType(file_type);
+
+    return Attachment.create({ ...data, file_type });
   }
 
   async getAllAttachments(query) {
-    const { limit, offset, sortBy = 'order_id', sortOrder = 'ASC', page } =
-      parsePagination(query);
+    const {
+      limit,
+      offset,
+      sortBy = 'order_id',
+      sortOrder = 'ASC',
+      page,
+    } = parsePagination(query);
 
-    const where = { order_id: query.order_id };
-    if (query.file_type) {
-      where.file_type = query.file_type;
-    }
-    if (query.search) {
-      where.file_path = { [Op.like]: `%${query.search}%` };
-    }
+    const where = { ...(query.order_id && { order_id: query.order_id }) };
+
+    if (query.file_type) where.file_type = query.file_type;
+    if (query.search) where.file_path = { [Op.like]: `%${query.search}%` };
 
     const { rows, count } = await Attachment.findAndCountAll({
       where,
@@ -72,29 +86,17 @@ class AttachmentService {
   }
 
   async updateAttachment(id, data) {
-    const att = await Attachment.findByPk(id);
-    if (!att) {
-      const err = new Error('Attachment not found');
-      err.statusCode = 404;
-      throw err;
+    const att = await this._getAttachmentOrThrow(id);
+
+    if (data.file_type) {
+      this._validateFileType(data.file_type);
     }
-    if (data.file_type && !AttachmentService.allowedTypes.includes(data.file_type)) {
-      const err = new Error(
-        `Invalid file_type. Allowed: ${AttachmentService.allowedTypes.join(', ')}`
-      );
-      err.statusCode = 400;
-      throw err;
-    }
+
     return att.update(data);
   }
 
   async deleteAttachment(id) {
-    const att = await Attachment.findByPk(id);
-    if (!att) {
-      const err = new Error('Attachment not found');
-      err.statusCode = 404;
-      throw err;
-    }
+    const att = await this._getAttachmentOrThrow(id);
     await att.destroy();
   }
 }
