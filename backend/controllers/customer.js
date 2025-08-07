@@ -1,16 +1,6 @@
 const customerService = require('../services/customerService');
-const { validationResult } = require('express-validator');
 
 class CustomerController {
-  // 🔒 Private helper for validating request body
-  #handleValidation(req, res) {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      res.status(400).json({ errors: errors.array() });
-      return false;
-    }
-    return true;
-  }
 
   // GET /customers
   async getAllCustomers(req, res, next) {
@@ -41,9 +31,20 @@ class CustomerController {
 
   // POST /customers
   async createCustomer(req, res, next) {
-    if (!this.#handleValidation(req, res)) return;
-
     try {
+      const { name, email, phone, company, address, tin_number } = req.body;
+
+      if(!name || !email || !phone || !company || !address || !tin_number) {
+        return res.status(400).json({
+          error: 'Bad Request',
+          message: 'All fields are required',
+        });
+      }
+       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        errors.push({ field: 'email', message: 'Email is invalid' });
+      }
+
       const customer = await customerService.createCustomer(req.body);
       res.status(201).json({
         message: 'Customer created successfully',
@@ -56,11 +57,22 @@ class CustomerController {
 
   // PUT /customers/:customer_id
   async updateCustomer(req, res, next) {
-    if (!this.#handleValidation(req, res)) return;
 
     try {
       const { customer_id } = req.params;
-      await customerService.updateCustomer(customer_id, req.body);
+      const { name, email, phone, company, address, tin_number } = req.body;
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({
+        error: 'Bad Request',
+        message: 'Invalid email format',
+      });
+    }
+    
+     await customerService.updateCustomer(customer_id, {
+      name, email, phone, company, address, tin_number
+    });
       res.status(200).json({ message: 'Customer updated successfully' });
     } catch (error) {
       next(error);
