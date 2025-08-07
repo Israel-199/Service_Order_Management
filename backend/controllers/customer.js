@@ -14,10 +14,34 @@ class CustomerController {
   // GET /customers
   async getAllCustomers(req, res, next) {
     try {
+      // Validate query parameters
+      const { limit, page } = req.query;
+      if (limit && (isNaN(limit) || parseInt(limit, 10) <= 0)) {
+        return res.status(400).json({ error: 'Limit must be a positive integer' });
+      }
+      if (page && (isNaN(page) || parseInt(page, 10) <= 0)) {
+        return res.status(400).json({ error: 'Page must be a positive integer' });
+      }
+
       const result = await customerService.getAllCustomers(req.query);
-      res.status(200).json({ message: 'Customers fetched successfully', ...result });
+
+      // Ensure consistent response even if no customers are found
+      res.status(200).json({
+        message: 'Customers fetched successfully',
+        customers: result.customers || [],
+        pagination: result.pagination || {
+          total: 0,
+          page: parseInt(page, 10) || 1,
+          limit: parseInt(limit, 10) || 10,
+          totalPages: 0,
+        },
+      });
     } catch (error) {
-      next(error);
+      // Specific error handling for known service errors
+      if (error.message.includes('Invalid search condition')) {
+        return res.status(400).json({ error: error.message });
+      }
+      next(error); // Pass other errors to error-handling middleware
     }
   }
 

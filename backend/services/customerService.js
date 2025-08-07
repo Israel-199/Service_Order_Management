@@ -14,8 +14,8 @@ class CustomerService {
     const {
       limit,
       offset,
-      sortBy = 'customer_id',
-      sortOrder = 'ASC',
+      sortBy,
+      sortOrder,
       page,
     } = parsePagination(query);
 
@@ -33,17 +33,43 @@ class CustomerService {
         'email',
         'phone',
         'company',
-        'address',
-        'tin_number',
         'created_at',
+      ],
+      include: [
+        {
+          model: ServiceOrder,
+          attributes: [['order_id', 'orderId'], 'status', 'created_at'],
+          include: [
+            {
+              model: ServiceType,
+              attributes: ['name'],
+            },
+          ],
+        },
       ],
       order: [[sortBy, sortOrder]],
       limit,
       offset,
     });
 
+    // Format the response to include service orders with serviceType
+    const formattedCustomers = customers.map(customer => ({
+      id: customer.id,
+      name: customer.name,
+      email: customer.email,
+      phone: customer.phone,
+      company: customer.company,
+      createdAt: customer.created_at,
+      serviceOrders: customer.ServiceOrders.map(order => ({
+        orderId: order.orderId,
+        serviceType: order.ServiceType ? order.ServiceType.name : null,
+        status: order.status,
+        createdAt: order.created_at,
+      })),
+    }));
+
     return {
-      customers,
+      customers: formattedCustomers,
       pagination: {
         total,
         page,
