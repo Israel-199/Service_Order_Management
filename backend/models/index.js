@@ -29,6 +29,7 @@ const {
   ServiceOrderAssignment,
   ServiceOrderStatusHistory,
   TechnicianServiceType,
+  Notification,
 } = db;
 
 // 3. Define associations between models
@@ -120,6 +121,11 @@ if (ServiceOrder && ServiceOrderStatusHistory && Employee) {
     foreignKey: 'changed_by',
     allowNull: true,
   });
+}
+
+// Notification ↔ ServiceOrder only (No employee association)
+if (Notification && ServiceOrder) {
+  Notification.belongsTo(ServiceOrder, { foreignKey: 'service_order_id' });
 }
 
 // 4. Export models and sequelize instance

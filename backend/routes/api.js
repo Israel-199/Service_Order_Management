@@ -8,7 +8,7 @@ const attachmentRoutes = require('./serviceOrderAttachmentRoutes');
 const employeeRoutes = require('./employeeRoutes');
 const DashboardRoutes = require('./DashboardRoutes'); // Import the service order dashboard routes
 const technicianServiceTypeRoutes = require('./_technicianServiceTypeRoutes');
-
+const notificationRoutes = require('./notificationRoutes');
 
 // router.use('/auth', authRoutes);
 router.use('/customers', customerRoutes);
@@ -17,7 +17,7 @@ router.use('/service-orders', serviceOrderRoutes);
 router.use('/service-orders/:order_id/attachments', attachmentRoutes);
 router.use('/employees', employeeRoutes);
 router.use('/dashboards', DashboardRoutes);
-
+router.use('/notifications', notificationRoutes);
 
 
 

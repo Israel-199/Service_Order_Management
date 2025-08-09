@@ -1,6 +1,6 @@
 const { Customer, ServiceOrder, ServiceType, Sequelize } = require('../models');
 const { parsePagination } = require('../utils/pagination');
-const { buildSearchCondition, buildSearchConditionWithFields, buildSearchConditionWithSequelize } = require('../utils/search');
+const { buildSearchCondition } = require('../utils/search');
 const { Op } = Sequelize;
 
 class CustomerService {

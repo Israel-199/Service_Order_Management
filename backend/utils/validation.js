@@ -16,5 +16,10 @@ const validateTechnicianServiceType = [
   body('lead_employees_id').isInt().withMessage('Lead employee ID must be an integer'),
   body('service_type_id').isInt().withMessage('Service type ID must be an integer'),
 ];
-
-module.exports = { validateCustomer, validateEmployee, validateTechnicianServiceType };
+const validateServiceOrder = [
+  body('customer_id').isInt().withMessage('Customer ID must be an integer'),
+  body('service_type_id').isInt().withMessage('Service Type ID must be an integer'),
+  body('lead_employees_id').optional().isInt().withMessage('Lead Employee ID must be an integer'),
+  // add more validations as needed
+];
+module.exports = { validateCustomer, validateEmployee, validateTechnicianServiceType, validateServiceOrder };

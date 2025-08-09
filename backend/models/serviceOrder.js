@@ -1,5 +1,4 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../database');
 
 module.exports = (sequelize, DataTypes) => {
   const ServiceOrder = sequelize.define('ServiceOrder', {
@@ -54,6 +53,10 @@ module.exports = (sequelize, DataTypes) => {
     updated_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
+    },
+    due_date: {
+      type: DataTypes.DATE,
+      allowNull: true,
     },
   }, {
     tableName: 'service_orders',

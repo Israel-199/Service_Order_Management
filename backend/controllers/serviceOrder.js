@@ -2,10 +2,11 @@
 const { ServiceOrder,
   ServiceOrderAssignment,
   Employee,
-  sequelize,         // ← your connected instance
-  Sequelize } = require('../models');
+  ServiceType,
+  Attachment,
+  Customer,
+ } = require('../models');
 
-const dashboardService = require('../services/dashboardService');
 const serviceOrderService = require('../services/serviceOrderService');
 
 /** 

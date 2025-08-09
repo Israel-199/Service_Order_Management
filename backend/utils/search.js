@@ -27,33 +27,4 @@ function buildSearchConditionWithSequelize(search, fields, Sequelize) {
   };
 }
 
-/**
- * Build a Sequelize `where` object for searching
- * with multiple conditions.
- * @param {string} search - search term
- * @param {Array<string>} fields - model fields to search
- */
-function buildSearchConditionWithFields(search, fields) {
-  if (!search) return {};
-  return {
-    [Op.or]: fields.map(field => ({
-      [field]: { [Op.like]: `%${search}%` }
-    }))
-  };
-}
-
-/**
- * Build a Sequelize `where` object for searching
- * with multiple conditions.
- * @param {string} search - search term
- * @param {Array<string>} fields - model fields to search
- */
-function buildSearchConditionWithFieldsAndSequelize(search, fields, Sequelize) {
-  if (!search) return {};
-  return {
-    [Op.or]: fields.map(field => ({
-      [field]: { [Sequelize.Op.like]: `%${search}%` }
-    }))
-  };
-}
-module.exports = { buildSearchCondition, buildSearchConditionWithSequelize, buildSearchConditionWithFields, buildSearchConditionWithFieldsAndSequelize };
+module.exports = { buildSearchCondition, buildSearchConditionWithSequelize };
