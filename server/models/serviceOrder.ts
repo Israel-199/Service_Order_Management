@@ -8,7 +8,7 @@ interface ServiceOrderAttributes {
   description?: string;
   priority: 'low' | 'medium' | 'high';
   status?: 'new' | 'assigned' | 'in_progress' | 'completed' | 'closed';
-  lead_employees_id?: number;
+  employee_id?: number;
   assigned_at?: Date;
   started_at?: Date;
   completed_at?: Date;
@@ -25,7 +25,7 @@ interface ServiceOrderCreationAttributes
     | 'order_id'
     | 'description'
     | 'status'
-    | 'lead_employees_id'
+    | 'employee_id'
     | 'assigned_at'
     | 'started_at'
     | 'completed_at'
@@ -46,7 +46,7 @@ class ServiceOrder
   public description?: string;
   public priority!: 'low' | 'medium' | 'high';
   public status?: 'new' | 'assigned' | 'in_progress' | 'completed' | 'closed';
-  public lead_employees_id?: number;
+  public employee_id?: number;
   public assigned_at?: Date;
   public started_at?: Date;
   public completed_at?: Date;
@@ -93,7 +93,7 @@ function initServiceOrder(sequelize: Sequelize): typeof ServiceOrder {
         type: DataTypes.ENUM('new', 'assigned', 'in_progress', 'completed', 'closed'),
         defaultValue: 'new',
       },
-      lead_employees_id: {
+      employee_id: {
         type: DataTypes.INTEGER,
         allowNull: true,
       },

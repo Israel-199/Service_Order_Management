@@ -67,4 +67,3 @@ export function initRecurringOrder(sequelize: Sequelize): typeof RecurringOrder 
 }
 
 export type { RecurringOrderAttributes, RecurringOrderCreationAttributes };
-export default RecurringOrder;

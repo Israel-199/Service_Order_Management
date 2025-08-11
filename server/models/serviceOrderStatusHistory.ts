@@ -77,3 +77,7 @@ function initServiceOrderStatusHistory(sequelize: Sequelize): typeof ServiceOrde
 
 //module.exports = initServiceOrderStatusHistory;
 export {ServiceOrderStatusHistory, initServiceOrderStatusHistory};
+export type {
+  ServiceOrderStatusHistoryAttributes,
+  ServiceOrderStatusHistoryCreationAttributes,
+};

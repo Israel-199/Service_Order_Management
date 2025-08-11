@@ -71,4 +71,4 @@ function initServiceType(sequelize: Sequelize): typeof ServiceType {
 export { ServiceType, initServiceType };
 
 // If you are using TypeScript, you can also export the types
-//export type { ServiceTypeAttributes, ServiceTypeCreationAttributes };
+export type { ServiceTypeAttributes, ServiceTypeCreationAttributes };

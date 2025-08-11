@@ -1,10 +1,10 @@
-import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
+import { DataTypes, Model, Optional, Sequelize } from "sequelize";
 
 // 1. Define model attributes interface
 interface ServiceOrderAssignmentAttributes {
   assignment_id: number;
   order_id: number;
-  employees_id: number;
+  employee_id: number;
   role_in_order?: string;
   assigned_at?: Date;
   unassigned_at?: Date;
@@ -15,16 +15,24 @@ interface ServiceOrderAssignmentAttributes {
 interface ServiceOrderAssignmentCreationAttributes
   extends Optional<
     ServiceOrderAssignmentAttributes,
-    'assignment_id' | 'role_in_order' | 'assigned_at' | 'unassigned_at' | 'notes'
+    | "assignment_id"
+    | "role_in_order"
+    | "assigned_at"
+    | "unassigned_at"
+    | "notes"
   > {}
 
 // 3. Define model class
 class ServiceOrderAssignment
-  extends Model<ServiceOrderAssignmentAttributes, ServiceOrderAssignmentCreationAttributes>
-  implements ServiceOrderAssignmentAttributes {
+  extends Model<
+    ServiceOrderAssignmentAttributes,
+    ServiceOrderAssignmentCreationAttributes
+  >
+  implements ServiceOrderAssignmentAttributes
+{
   public assignment_id!: number;
   public order_id!: number;
-  public employees_id!: number;
+  public employee_id!: number;
   public role_in_order?: string;
   public assigned_at?: Date;
   public unassigned_at?: Date;
@@ -32,7 +40,9 @@ class ServiceOrderAssignment
 }
 
 // 4. Init function to initialize model
-function initServiceOrderAssignment(sequelize: Sequelize): typeof ServiceOrderAssignment {
+function initServiceOrderAssignment(
+  sequelize: Sequelize
+): typeof ServiceOrderAssignment {
   ServiceOrderAssignment.init(
     {
       assignment_id: {
@@ -44,9 +54,15 @@ function initServiceOrderAssignment(sequelize: Sequelize): typeof ServiceOrderAs
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      employees_id: {
+      employee_id: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true, // <-- make sure this is true
+        references: {
+          model: "employees",
+          key: "employee_id",
+        },
+        onDelete: "SET NULL",
+        onUpdate: "CASCADE",
       },
       role_in_order: {
         type: DataTypes.STRING(50),
@@ -68,7 +84,7 @@ function initServiceOrderAssignment(sequelize: Sequelize): typeof ServiceOrderAs
     },
     {
       sequelize,
-      tableName: 'service_order_assignments',
+      tableName: "service_order_assignments",
       timestamps: false,
     }
   );
@@ -76,7 +92,9 @@ function initServiceOrderAssignment(sequelize: Sequelize): typeof ServiceOrderAs
   return ServiceOrderAssignment;
 }
 
-//module.exports = initServiceOrderAssignment;
 export { ServiceOrderAssignment, initServiceOrderAssignment };
-export type { ServiceOrderAssignmentAttributes, ServiceOrderAssignmentCreationAttributes };
-export default ServiceOrderAssignment; // Default export for ES6 modules
+export type {
+  ServiceOrderAssignmentAttributes,
+  ServiceOrderAssignmentCreationAttributes,
+};
+

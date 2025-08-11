@@ -1,30 +1,30 @@
 import { DataTypes, Model, Sequelize } from 'sequelize';
 
 // 1. Define model attributes interface
-interface TechnicianServiceTypeAttributes {
-  lead_employees_id: number;
+interface EmployeeServiceTypeAttributes {
+  employee_id: number;
   service_type_id: number;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
 // 2. Creation attributes (all required except timestamps)
-interface TechnicianServiceTypeCreationAttributes extends Partial<Pick<TechnicianServiceTypeAttributes, 'createdAt' | 'updatedAt'>> {}
+interface EmployeeServiceTypeCreationAttributes extends Partial<Pick<EmployeeServiceTypeAttributes, 'createdAt' | 'updatedAt'>> {}
 
 // 3. Define the model class
-export class TechnicianServiceType extends Model<TechnicianServiceTypeAttributes, TechnicianServiceTypeCreationAttributes>
-  implements TechnicianServiceTypeAttributes {
-  public lead_employees_id!: number;
+export class EmployeeServiceType extends Model<EmployeeServiceTypeAttributes, EmployeeServiceTypeCreationAttributes>
+  implements EmployeeServiceTypeAttributes {
+  public employee_id!: number;
   public service_type_id!: number;
   public createdAt?: Date;
   public updatedAt?: Date;
 }
 
 // 4. Init function for model
-export function initTechnicianServiceType(sequelize: Sequelize): typeof TechnicianServiceType {
-  TechnicianServiceType.init(
+export function initEmployeeServiceType(sequelize: Sequelize): typeof EmployeeServiceType {
+  EmployeeServiceType.init(
     {
-      lead_employees_id: {
+      employee_id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         allowNull: false,
@@ -47,10 +47,10 @@ export function initTechnicianServiceType(sequelize: Sequelize): typeof Technici
     },
     {
       sequelize,
-      tableName: 'technician_service_types',
+      tableName: 'employee_service_types',
       timestamps: true,
     }
   );
 
-  return TechnicianServiceType;
+  return EmployeeServiceType;
 }

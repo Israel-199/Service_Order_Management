@@ -5,6 +5,8 @@
  * In production: use migrations instead (sequelize-cli).
  */
 
+
+
 import { sequelize } from './models';
 
 (async () => {

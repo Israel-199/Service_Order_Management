@@ -1,5 +1,6 @@
+// models/index.ts
 import { Sequelize } from 'sequelize';
-import sequelize from '../config/database'; // Your configured Sequelize instance
+import sequelize from '../config/database';
 
 // Import model classes and init functions
 import { Customer, initCustomer } from './customer';
@@ -9,9 +10,15 @@ import { ServiceOrder, initServiceOrder } from './serviceOrder';
 import { Attachment, initAttachment } from './attachment';
 import { RecurringOrder, initRecurringOrder } from './recurringOrder';
 import { ServiceOrderItem, initServiceOrderItem } from './serviceOrderItem';
-import { ServiceOrderAssignment, initServiceOrderAssignment } from './serviceOrderAssignment';
-import { ServiceOrderStatusHistory, initServiceOrderStatusHistory } from './serviceOrderStatusHistory';
-import { TechnicianServiceType, initTechnicianServiceType } from './technicianServiceType';
+import {
+  ServiceOrderAssignment,
+  initServiceOrderAssignment,
+} from './serviceOrderAssignment';
+import {
+  ServiceOrderStatusHistory,
+  initServiceOrderStatusHistory,
+} from './serviceOrderStatusHistory';
+import { EmployeeServiceType, initEmployeeServiceType } from './employeeServiceType';
 import { Notification, initNotification } from './notification';
 
 // Initialize models
@@ -24,85 +31,94 @@ const RecurringOrderModel = initRecurringOrder(sequelize);
 const ServiceOrderItemModel = initServiceOrderItem(sequelize);
 const ServiceOrderAssignmentModel = initServiceOrderAssignment(sequelize);
 const ServiceOrderStatusHistoryModel = initServiceOrderStatusHistory(sequelize);
-const TechnicianServiceTypeModel = initTechnicianServiceType(sequelize);
+const EmployeeServiceTypeModel = initEmployeeServiceType(sequelize);
 const NotificationModel = initNotification(sequelize);
 
-//
+// ==================== Associations ====================
 
-// Setup associations
-
-// Customer ↔ ServiceOrder
+// Customer -> ServiceOrder (one-to-many)
 CustomerModel.hasMany(ServiceOrderModel, { foreignKey: 'customer_id' });
 ServiceOrderModel.belongsTo(CustomerModel, { foreignKey: 'customer_id' });
 
-// ServiceType ↔ ServiceOrder
+// ServiceType -> ServiceOrder (one-to-many)
 ServiceTypeModel.hasMany(ServiceOrderModel, { foreignKey: 'service_type_id' });
 ServiceOrderModel.belongsTo(ServiceTypeModel, { foreignKey: 'service_type_id' });
 
-// Employee (Lead) ↔ ServiceOrder
-EmployeeModel.hasMany(ServiceOrderModel, { foreignKey: 'lead_employees_id' });
+// Employee (lead) -> ServiceOrder (one-to-many)
+// NOTE: your ServiceOrder model uses `lead_employee_id` based on the model you shared earlier.
+// Use that column name so associations map correctly.
+EmployeeModel.hasMany(ServiceOrderModel, { foreignKey: 'lead_employee_id', as: 'leadOrders' });
 ServiceOrderModel.belongsTo(EmployeeModel, {
-  foreignKey: 'lead_employees_id',
+  foreignKey: 'lead_employee_id',
   as: 'leadEmployee',
 });
 
-// ServiceOrder ↔ Attachment
+// ServiceOrder -> Attachment (one-to-many)
 ServiceOrderModel.hasMany(AttachmentModel, { foreignKey: 'order_id' });
 AttachmentModel.belongsTo(ServiceOrderModel, { foreignKey: 'order_id' });
 
-// ServiceOrder ↔ RecurringOrder
+// ServiceOrder -> RecurringOrder (one-to-many)
 ServiceOrderModel.hasMany(RecurringOrderModel, { foreignKey: 'order_id' });
 RecurringOrderModel.belongsTo(ServiceOrderModel, { foreignKey: 'order_id' });
 
-// Employee ↔ ServiceType (Many-to-Many via technician_service_types)
+// Employee <-> ServiceType (many-to-many) via employee_service_types (through model)
 EmployeeModel.belongsToMany(ServiceTypeModel, {
-  through: TechnicianServiceTypeModel,
-  foreignKey: 'lead_employees_id',
+  through: EmployeeServiceTypeModel,
+  foreignKey: 'employee_id',     // employee_service_types.employee_id
   otherKey: 'service_type_id',
 });
 ServiceTypeModel.belongsToMany(EmployeeModel, {
-  through: TechnicianServiceTypeModel,
+  through: EmployeeServiceTypeModel,
   foreignKey: 'service_type_id',
-  otherKey: 'lead_employees_id',
+  otherKey: 'employee_id',
 });
 
-// TechnicianServiceType associations
-TechnicianServiceTypeModel.belongsTo(EmployeeModel, { foreignKey: 'lead_employees_id' });
-TechnicianServiceTypeModel.belongsTo(ServiceTypeModel, { foreignKey: 'service_type_id' });
+// Also set explicit belongsTo for the through model (handy for queries)
+EmployeeServiceTypeModel.belongsTo(EmployeeModel, { foreignKey: 'employee_id' });
+EmployeeServiceTypeModel.belongsTo(ServiceTypeModel, { foreignKey: 'service_type_id' });
+EmployeeModel.hasMany(EmployeeServiceTypeModel, { foreignKey: 'employee_id' });
+ServiceTypeModel.hasMany(EmployeeServiceTypeModel, { foreignKey: 'service_type_id' });
 
-// ServiceOrder ↔ ServiceOrderItem ↔ ServiceType
+// ServiceOrder -> ServiceOrderItem -> ServiceType
 ServiceOrderModel.hasMany(ServiceOrderItemModel, { foreignKey: 'order_id' });
 ServiceOrderItemModel.belongsTo(ServiceOrderModel, { foreignKey: 'order_id' });
+
 ServiceTypeModel.hasMany(ServiceOrderItemModel, { foreignKey: 'service_type_id' });
 ServiceOrderItemModel.belongsTo(ServiceTypeModel, { foreignKey: 'service_type_id' });
 
-// ServiceOrder ↔ ServiceOrderAssignment ↔ Employee (Many-to-Many)
+// ServiceOrder -> ServiceOrderAssignment -> Employee (many-to-many via assignment model)
+// NOTE: your ServiceOrderAssignment model uses `employee_id` (plural) in the model you provided earlier.
+// Use those names here so Sequelize can find the correct columns.
 ServiceOrderModel.hasMany(ServiceOrderAssignmentModel, { foreignKey: 'order_id' });
 ServiceOrderAssignmentModel.belongsTo(ServiceOrderModel, { foreignKey: 'order_id' });
 
-EmployeeModel.hasMany(ServiceOrderAssignmentModel, { foreignKey: 'employees_id' });
-ServiceOrderAssignmentModel.belongsTo(EmployeeModel, { foreignKey: 'employees_id' });
+EmployeeModel.hasMany(ServiceOrderAssignmentModel, { foreignKey: 'employee_id' });
+ServiceOrderAssignmentModel.belongsTo(EmployeeModel, { foreignKey: 'employee_id' });
 
 ServiceOrderModel.belongsToMany(EmployeeModel, {
   through: ServiceOrderAssignmentModel,
   foreignKey: 'order_id',
-  otherKey: 'employees_id',
+  otherKey: 'employee_id',
 });
 EmployeeModel.belongsToMany(ServiceOrderModel, {
   through: ServiceOrderAssignmentModel,
-  foreignKey: 'employees_id',
+  foreignKey: 'employee_id',
   otherKey: 'order_id',
 });
 
-// ServiceOrder ↔ ServiceOrderStatusHistory ↔ Employee
+// ServiceOrder -> ServiceOrderStatusHistory -> Employee
+// Use `changed_by` for the user who changed status (if your status history model uses that column).
+// If your model actually uses 'employee_id' replace it accordingly — but `changed_by` is common.
 ServiceOrderModel.hasMany(ServiceOrderStatusHistoryModel, { foreignKey: 'order_id' });
 ServiceOrderStatusHistoryModel.belongsTo(ServiceOrderModel, { foreignKey: 'order_id' });
 ServiceOrderStatusHistoryModel.belongsTo(EmployeeModel, { foreignKey: 'changed_by' });
 
-// Notification ↔ ServiceOrder
+// Notification <-> ServiceOrder
+// Add both sides so includes work cleanly
+ServiceOrderModel.hasMany(NotificationModel, { foreignKey: 'service_order_id' });
 NotificationModel.belongsTo(ServiceOrderModel, { foreignKey: 'service_order_id' });
 
-// Define DB interface for typings
+// ==================== Typings ====================
 export interface DB {
   sequelize: Sequelize;
   Customer: typeof Customer;
@@ -114,11 +130,11 @@ export interface DB {
   ServiceOrderItem: typeof ServiceOrderItem;
   ServiceOrderAssignment: typeof ServiceOrderAssignment;
   ServiceOrderStatusHistory: typeof ServiceOrderStatusHistory;
-  TechnicianServiceType: typeof TechnicianServiceType;
+  EmployeeServiceType: typeof EmployeeServiceType;
   Notification: typeof Notification;
 }
 
-// Export db and sequelize
+// ==================== DB Object ====================
 const db: DB = {
   sequelize,
   Customer: CustomerModel,
@@ -130,7 +146,7 @@ const db: DB = {
   ServiceOrderItem: ServiceOrderItemModel,
   ServiceOrderAssignment: ServiceOrderAssignmentModel,
   ServiceOrderStatusHistory: ServiceOrderStatusHistoryModel,
-  TechnicianServiceType: TechnicianServiceTypeModel,
+  EmployeeServiceType: EmployeeServiceTypeModel,
   Notification: NotificationModel,
 };
 

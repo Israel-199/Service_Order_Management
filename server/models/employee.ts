@@ -2,7 +2,7 @@
 import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
 
 export interface EmployeeAttributes {
-  employees_id: number;
+  employee_id: number;
   name: string;
   email: string;
   phone?: string;
@@ -11,10 +11,10 @@ export interface EmployeeAttributes {
   status?: 'active' | 'inactive';
 }
 
-export interface EmployeeCreationAttributes extends Optional<EmployeeAttributes, 'employees_id' | 'created_at' | 'status'> {}
+export interface EmployeeCreationAttributes extends Optional<EmployeeAttributes, 'employee_id' | 'created_at' | 'status'> {}
 
 export class Employee extends Model<EmployeeAttributes, EmployeeCreationAttributes> implements EmployeeAttributes {
-  public employees_id!: number;
+  public employee_id!: number;
   public name!: string;
   public email!: string;
   public phone?: string;
@@ -26,7 +26,7 @@ export class Employee extends Model<EmployeeAttributes, EmployeeCreationAttribut
 export function initEmployee(sequelize: Sequelize): typeof Employee {
   Employee.init(
     {
-      employees_id: {
+      employee_id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,

@@ -68,4 +68,4 @@ function initServiceOrderItem(sequelize: Sequelize): typeof ServiceOrderItem {
 export { ServiceOrderItem, initServiceOrderItem };
 
 // Export the model for use in other parts of the application
-export default ServiceOrderItem;
+export type { ServiceOrderItemAttributes, ServiceOrderItemCreationAttributes };
