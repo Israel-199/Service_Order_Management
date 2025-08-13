@@ -1,16 +1,3 @@
-#To Run the migrations 
-
-##From your project root (where package.json is), run: 
-
-	npx sequelize-cli db:migrate 
-
-##or, if you have Sequelize CLI installed globally: 
-
-	sequelize db:migrate 
-
-
-
-
 GET http://localhost:3000/api/service-orders
 GET http://localhost:3000/api/notifications
 GET http://localhost:3000/api/dashboard/home
