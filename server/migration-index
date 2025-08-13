@@ -1,0 +1,421 @@
+-- ==========================================
+-- MASTER INDEX MIGRATION SCRIPT (UPDATED)
+-- ==========================================
+
+-- ========================
+-- UP Migration
+-- ========================
+START TRANSACTION;
+
+-- Attachments (order_id)
+SET @idx_exists := (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'attachments'
+      AND INDEX_NAME = 'idx_attachments_order_id'
+);
+SET @query := IF(@idx_exists = 0,
+    'CREATE INDEX idx_attachments_order_id ON attachments (order_id)',
+    'SELECT "Index idx_attachments_order_id already exists"');
+PREPARE stmt FROM @query; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- Recurring Orders (order_id)
+SET @idx_exists := (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'recurring_orders'
+      AND INDEX_NAME = 'idx_recurring_orders_order_id'
+);
+SET @query := IF(@idx_exists = 0,
+    'CREATE INDEX idx_recurring_orders_order_id ON recurring_orders (order_id)',
+    'SELECT "Index idx_recurring_orders_order_id already exists"');
+PREPARE stmt FROM @query; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- Service Order Items (order_id)
+SET @idx_exists := (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'service_order_items'
+      AND INDEX_NAME = 'idx_service_order_items_order_id'
+);
+SET @query := IF(@idx_exists = 0,
+    'CREATE INDEX idx_service_order_items_order_id ON service_order_items (order_id)',
+    'SELECT "Index idx_service_order_items_order_id already exists"');
+PREPARE stmt FROM @query; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- Service Order Items (service_type_id)
+SET @idx_exists := (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'service_order_items'
+      AND INDEX_NAME = 'idx_service_order_items_service_type_id'
+);
+SET @query := IF(@idx_exists = 0,
+    'CREATE INDEX idx_service_order_items_service_type_id ON service_order_items (service_type_id)',
+    'SELECT "Index idx_service_order_items_service_type_id already exists"');
+PREPARE stmt FROM @query; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- Employee Service Types (employee_id)
+SET @idx_exists := (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'employee_service_types'
+      AND INDEX_NAME = 'idx_employee_service_types_employee_id'
+);
+SET @query := IF(@idx_exists = 0,
+    'CREATE INDEX idx_employee_service_types_employee_id ON employee_service_types (employee_id)',
+    'SELECT "Index idx_employee_service_types_employee_id already exists"');
+PREPARE stmt FROM @query; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- Employee Service Types (service_type_id)
+SET @idx_exists := (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'employee_service_types'
+      AND INDEX_NAME = 'idx_employee_service_types_service_type_id'
+);
+SET @query := IF(@idx_exists = 0,
+    'CREATE INDEX idx_employee_service_types_service_type_id ON employee_service_types (service_type_id)',
+    'SELECT "Index idx_employee_service_types_service_type_id already exists"');
+PREPARE stmt FROM @query; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- Service Order Status History (order_id)
+SET @idx_exists := (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'service_order_status_history'
+      AND INDEX_NAME = 'idx_service_order_status_history_order_id'
+);
+SET @query := IF(@idx_exists = 0,
+    'CREATE INDEX idx_service_order_status_history_order_id ON service_order_status_history (order_id)',
+    'SELECT "Index idx_service_order_status_history_order_id already exists"');
+PREPARE stmt FROM @query; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- Service Order Status History (changed_by)
+SET @idx_exists := (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'service_order_status_history'
+      AND INDEX_NAME = 'idx_service_order_status_history_changed_by'
+);
+SET @query := IF(@idx_exists = 0,
+    'CREATE INDEX idx_service_order_status_history_changed_by ON service_order_status_history (changed_by)',
+    'SELECT "Index idx_service_order_status_history_changed_by already exists"');
+PREPARE stmt FROM @query; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- Service Order Assignments (order_id)
+SET @idx_exists := (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'service_order_assignments'
+      AND INDEX_NAME = 'idx_service_order_assignments_order_id'
+);
+SET @query := IF(@idx_exists = 0,
+    'CREATE INDEX idx_service_order_assignments_order_id ON service_order_assignments (order_id)',
+    'SELECT "Index idx_service_order_assignments_order_id already exists"');
+PREPARE stmt FROM @query; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- Service Order Assignments (employee_id)
+SET @idx_exists := (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'service_order_assignments'
+      AND INDEX_NAME = 'idx_service_order_assignments_employee_id'
+);
+SET @query := IF(@idx_exists = 0,
+    'CREATE INDEX idx_service_order_assignments_employee_id ON service_order_assignments (employee_id)',
+    'SELECT "Index idx_service_order_assignments_employee_id already exists"');
+PREPARE stmt FROM @query; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- Service Orders (due_date)
+SET @idx_exists := (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'service_orders'
+      AND INDEX_NAME = 'idx_service_orders_due_date'
+);
+SET @query := IF(@idx_exists = 0,
+    'CREATE INDEX idx_service_orders_due_date ON service_orders (due_date)',
+    'SELECT "Index idx_service_orders_due_date already exists"');
+PREPARE stmt FROM @query; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- Notifications (employee_id)
+SET @idx_exists := (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'notifications'
+      AND INDEX_NAME = 'idx_notifications_employee_id'
+);
+SET @query := IF(@idx_exists = 0,
+    'CREATE INDEX idx_notifications_employee_id ON notifications (employee_id)',
+    'SELECT "Index idx_notifications_employee_id already exists"');
+PREPARE stmt FROM @query; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- Notifications (service_order_id)
+SET @idx_exists := (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'notifications'
+      AND INDEX_NAME = 'idx_notifications_service_order_id'
+);
+SET @query := IF(@idx_exists = 0,
+    'CREATE INDEX idx_notifications_service_order_id ON notifications (service_order_id)',
+    'SELECT "Index idx_notifications_service_order_id already exists"');
+PREPARE stmt FROM @query; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+COMMIT;
+
+
+-- ========================
+-- DOWN Migration
+-- ========================
+START TRANSACTION;
+
+-- Attachments (order_id)
+SET @fk_exists := (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'attachments'
+      AND COLUMN_NAME = 'order_id'
+      AND REFERENCED_TABLE_NAME IS NOT NULL
+);
+SET @idx_exists := (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'attachments'
+      AND INDEX_NAME = 'idx_attachments_order_id'
+);
+SET @query := IF(@idx_exists > 0 AND @fk_exists = 0,
+    'DROP INDEX idx_attachments_order_id ON attachments',
+    'SELECT "Skipping removal of idx_attachments_order_id"');
+PREPARE stmt FROM @query; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- Recurring Orders (order_id)
+SET @fk_exists := (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'recurring_orders'
+      AND COLUMN_NAME = 'order_id'
+      AND REFERENCED_TABLE_NAME IS NOT NULL
+);
+SET @idx_exists := (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'recurring_orders'
+      AND INDEX_NAME = 'idx_recurring_orders_order_id'
+);
+SET @query := IF(@idx_exists > 0 AND @fk_exists = 0,
+    'DROP INDEX idx_recurring_orders_order_id ON recurring_orders',
+    'SELECT "Skipping removal of idx_recurring_orders_order_id"');
+PREPARE stmt FROM @query; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- Service Order Items (order_id)
+SET @fk_exists := (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'service_order_items'
+      AND COLUMN_NAME = 'order_id'
+      AND REFERENCED_TABLE_NAME IS NOT NULL
+);
+SET @idx_exists := (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'service_order_items'
+      AND INDEX_NAME = 'idx_service_order_items_order_id'
+);
+SET @query := IF(@idx_exists > 0 AND @fk_exists = 0,
+    'DROP INDEX idx_service_order_items_order_id ON service_order_items',
+    'SELECT "Skipping removal of idx_service_order_items_order_id"');
+PREPARE stmt FROM @query; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- Service Order Items (service_type_id)
+SET @fk_exists := (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'service_order_items'
+      AND COLUMN_NAME = 'service_type_id'
+      AND REFERENCED_TABLE_NAME IS NOT NULL
+);
+SET @idx_exists := (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'service_order_items'
+      AND INDEX_NAME = 'idx_service_order_items_service_type_id'
+);
+SET @query := IF(@idx_exists > 0 AND @fk_exists = 0,
+    'DROP INDEX idx_service_order_items_service_type_id ON service_order_items',
+    'SELECT "Skipping removal of idx_service_order_items_service_type_id"');
+PREPARE stmt FROM @query; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- Employee Service Types (employee_id)
+SET @fk_exists := (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'employee_service_types'
+      AND COLUMN_NAME = 'employee_id'
+      AND REFERENCED_TABLE_NAME IS NOT NULL
+);
+SET @idx_exists := (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'employee_service_types'
+      AND INDEX_NAME = 'idx_employee_service_types_employee_id'
+);
+SET @query := IF(@idx_exists > 0 AND @fk_exists = 0,
+    'DROP INDEX idx_employee_service_types_employee_id ON employee_service_types',
+    'SELECT "Skipping removal of idx_employee_service_types_employee_id"');
+PREPARE stmt FROM @query; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- Employee Service Types (service_type_id)
+SET @fk_exists := (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'employee_service_types'
+      AND COLUMN_NAME = 'service_type_id'
+      AND REFERENCED_TABLE_NAME IS NOT NULL
+);
+SET @idx_exists := (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'employee_service_types'
+      AND INDEX_NAME = 'idx_employee_service_types_service_type_id'
+);
+SET @query := IF(@idx_exists > 0 AND @fk_exists = 0,
+    'DROP INDEX idx_employee_service_types_service_type_id ON employee_service_types',
+    'SELECT "Skipping removal of idx_employee_service_types_service_type_id"');
+PREPARE stmt FROM @query; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- Service Order Status History (order_id)
+SET @fk_exists := (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'service_order_status_history'
+      AND COLUMN_NAME = 'order_id'
+      AND REFERENCED_TABLE_NAME IS NOT NULL
+);
+SET @idx_exists := (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'service_order_status_history'
+      AND INDEX_NAME = 'idx_service_order_status_history_order_id'
+);
+SET @query := IF(@idx_exists > 0 AND @fk_exists = 0,
+    'DROP INDEX idx_service_order_status_history_order_id ON service_order_status_history',
+    'SELECT "Skipping removal of idx_service_order_status_history_order_id"');
+PREPARE stmt FROM @query; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- Service Order Status History (changed_by)
+SET @fk_exists := (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'service_order_status_history'
+      AND COLUMN_NAME = 'changed_by'
+      AND REFERENCED_TABLE_NAME IS NOT NULL
+);
+SET @idx_exists := (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'service_order_status_history'
+      AND INDEX_NAME = 'idx_service_order_status_history_changed_by'
+);
+SET @query := IF(@idx_exists > 0 AND @fk_exists = 0,
+    'DROP INDEX idx_service_order_status_history_changed_by ON service_order_status_history',
+    'SELECT "Skipping removal of idx_service_order_status_history_changed_by"');
+PREPARE stmt FROM @query; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- Service Order Assignments (order_id)
+SET @fk_exists := (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'service_order_assignments'
+      AND COLUMN_NAME = 'order_id'
+      AND REFERENCED_TABLE_NAME IS NOT NULL
+);
+SET @idx_exists := (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'service_order_assignments'
+      AND INDEX_NAME = 'idx_service_order_assignments_order_id'
+);
+SET @query := IF(@idx_exists > 0 AND @fk_exists = 0,
+    'DROP INDEX idx_service_order_assignments_order_id ON service_order_assignments',
+    'SELECT "Skipping removal of idx_service_order_assignments_order_id"');
+PREPARE stmt FROM @query; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- Service Order Assignments (employee_id)
+SET @fk_exists := (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'service_order_assignments'
+      AND COLUMN_NAME = 'employee_id'
+      AND REFERENCED_TABLE_NAME IS NOT NULL
+);
+SET @idx_exists := (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'service_order_assignments'
+      AND INDEX_NAME = 'idx_service_order_assignments_employee_id'
+);
+SET @query := IF(@idx_exists > 0 AND @fk_exists = 0,
+    'DROP INDEX idx_service_order_assignments_employee_id ON service_order_assignments',
+    'SELECT "Skipping removal of idx_service_order_assignments_employee_id"');
+PREPARE stmt FROM @query; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- Service Orders (due_date)
+SET @fk_exists := (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'service_orders'
+      AND COLUMN_NAME = 'due_date'
+      AND REFERENCED_TABLE_NAME IS NOT NULL
+);
+SET @idx_exists := (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'service_orders'
+      AND INDEX_NAME = 'idx_service_orders_due_date'
+);
+SET @query := IF(@idx_exists > 0 AND @fk_exists = 0,
+    'DROP INDEX idx_service_orders_due_date ON service_orders',
+    'SELECT "Skipping removal of idx_service_orders_due_date"');
+PREPARE stmt FROM @query; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- Notifications (employee_id)
+SET @fk_exists := (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'notifications'
+      AND COLUMN_NAME = 'employee_id'
+      AND REFERENCED_TABLE_NAME IS NOT NULL
+);
+SET @idx_exists := (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'notifications'
+      AND INDEX_NAME = 'idx_notifications_employee_id'
+);
+SET @query := IF(@idx_exists > 0 AND @fk_exists = 0,
+    'DROP INDEX idx_notifications_employee_id ON notifications',
+    'SELECT "Skipping removal of idx_notifications_employee_id"');
+PREPARE stmt FROM @query; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- Notifications (service_order_id)
+SET @fk_exists := (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'notifications'
+      AND COLUMN_NAME = 'service_order_id'
+      AND REFERENCED_TABLE_NAME IS NOT NULL
+);
+SET @idx_exists := (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'notifications'
+      AND INDEX_NAME = 'idx_notifications_service_order_id'
+);
+SET @query := IF(@idx_exists > 0 AND @fk_exists = 0,
+    'DROP INDEX idx_notifications_service_order_id ON notifications',
+    'SELECT "Skipping removal of idx_notifications_service_order_id"');
+PREPARE stmt FROM @query; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+COMMIT;
