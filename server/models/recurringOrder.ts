@@ -1,6 +1,5 @@
-import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
-
-// 1. Define attributes interface
+import { DataTypes, Model, Sequelize } from 'sequelize';
+import type { Optional } from 'sequelize';
 interface RecurringOrderAttributes {
   recurring_id: number;
   order_id: number;
@@ -10,11 +9,9 @@ interface RecurringOrderAttributes {
   created_at?: Date;
 }
 
-// 2. Define creation attributes (optional on creation)
 interface RecurringOrderCreationAttributes
   extends Optional<RecurringOrderAttributes, 'recurring_id' | 'frequency' | 'next_due_date' | 'created_at'> {}
 
-// 3. Define the model class
 export class RecurringOrder extends Model<RecurringOrderAttributes, RecurringOrderCreationAttributes>
   implements RecurringOrderAttributes {
   public recurring_id!: number;
@@ -25,7 +22,6 @@ export class RecurringOrder extends Model<RecurringOrderAttributes, RecurringOrd
   public created_at?: Date;
 }
 
-// 4. Init function for the model
 export function initRecurringOrder(sequelize: Sequelize): typeof RecurringOrder {
   RecurringOrder.init(
     {
@@ -60,10 +56,9 @@ export function initRecurringOrder(sequelize: Sequelize): typeof RecurringOrder 
       sequelize,
       tableName: 'recurring_orders',
       timestamps: false,
+      underscored: true,
     }
   );
 
   return RecurringOrder;
 }
-
-export type { RecurringOrderAttributes, RecurringOrderCreationAttributes };

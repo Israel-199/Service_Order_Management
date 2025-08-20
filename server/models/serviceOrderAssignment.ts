@@ -1,5 +1,5 @@
-import { DataTypes, Model, Optional, Sequelize } from "sequelize";
-
+import { DataTypes, Model, Sequelize } from "sequelize";
+import type { Optional } from 'sequelize';
 // 1. Define model attributes interface
 interface ServiceOrderAssignmentAttributes {
   assignment_id: number;
@@ -84,8 +84,9 @@ function initServiceOrderAssignment(
     },
     {
       sequelize,
-      tableName: "service_order_assignments",
-      timestamps: false,
+      tableName: 'service_order_assignments',
+      timestamps: false,   // we manage created_at/updated_at manually
+      underscored: true,   // map camelCase <-> snake_case columns
     }
   );
 

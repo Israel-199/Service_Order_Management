@@ -1,6 +1,5 @@
-import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
-
-// 1. Define the model attributes interface
+import { DataTypes, Model, Sequelize } from 'sequelize';
+import type { Optional } from 'sequelize';
 interface ServiceTypeAttributes {
   service_type_id: number;
   name: string;
@@ -9,11 +8,9 @@ interface ServiceTypeAttributes {
   created_at?: Date;
 }
 
-// 2. Define creation attributes for optional fields on create
 interface ServiceTypeCreationAttributes
   extends Optional<ServiceTypeAttributes, 'service_type_id' | 'slug' | 'description' | 'created_at'> {}
 
-// 3. Define the class model
 class ServiceType extends Model<ServiceTypeAttributes, ServiceTypeCreationAttributes>
   implements ServiceTypeAttributes {
   public service_type_id!: number;
@@ -21,11 +18,8 @@ class ServiceType extends Model<ServiceTypeAttributes, ServiceTypeCreationAttrib
   public slug?: string;
   public description?: string;
   public created_at?: Date;
-
-  // You can add instance or static methods here
 }
 
-// 4. Init function to call from your model index
 function initServiceType(sequelize: Sequelize): typeof ServiceType {
   ServiceType.init(
     {
@@ -57,18 +51,12 @@ function initServiceType(sequelize: Sequelize): typeof ServiceType {
       sequelize,
       tableName: 'service_types',
       timestamps: false,
+      underscored: true,
     }
   );
 
   return ServiceType;
 }
 
-// Export CommonJS style
-//module.exports = initServiceType;
-
-// Export ES6 style
-//export default initServiceType;
 export { ServiceType, initServiceType };
-
-// If you are using TypeScript, you can also export the types
 export type { ServiceTypeAttributes, ServiceTypeCreationAttributes };

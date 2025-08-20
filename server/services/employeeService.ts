@@ -15,7 +15,7 @@ import { Op, WhereOptions } from "sequelize";
 // Define an EmployeeInstance type that represents an instance of Employee model
 type EmployeeInstance = Model<EmployeeAttributes, EmployeeCreationAttributes> & EmployeeAttributes;
 
-interface EmployeeWithId extends Omit<EmployeeAttributes, "employees_id"> {
+interface EmployeeWithId extends Omit<EmployeeAttributes, "employee_id"> {
   id: number;
 }
 
@@ -57,7 +57,7 @@ class EmployeeService {
     const { rows: employees, count: total } = await db.Employee.findAndCountAll({
       where: whereClause,
       attributes: [
-        ["employees_id", "id"],
+        ["employee_id", "id"],
         "name",
         "email",
         "phone",
@@ -114,7 +114,7 @@ class EmployeeService {
   async getEmployeeById(id: number): Promise<EmployeeInstance | null> {
     return await db.Employee.findByPk(id, {
       attributes: [
-        ["employees_id", "id"],
+        ["employee_id", "id"],
         "name",
         "email",
         "phone",
@@ -132,7 +132,7 @@ class EmployeeService {
         },
       },
       attributes: [
-        ["employees_id", "id"],
+        ["employee_id", "id"],
         "name",
         "email",
         "phone",
@@ -146,7 +146,7 @@ class EmployeeService {
     return await db.Employee.findOne({
       where: { phone },
       attributes: [
-        ["employees_id", "id"],
+        ["employee_id", "id"],
         "name",
         "email",
         "phone",
@@ -164,7 +164,7 @@ class EmployeeService {
         },
       },
       attributes: [
-        ["employees_id", "id"],
+        ["employee_id", "id"],
         "name",
         "email",
         "phone",

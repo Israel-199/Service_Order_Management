@@ -9,7 +9,7 @@ import { ServiceType, initServiceType } from './serviceType';
 import { ServiceOrder, initServiceOrder } from './serviceOrder';
 import { Attachment, initAttachment } from './attachment';
 import { RecurringOrder, initRecurringOrder } from './recurringOrder';
-import { ServiceOrderItem, initServiceOrderItem } from './serviceOrderItem';
+//import { ServiceOrderItem, initServiceOrderItem } from './serviceOrderItem';
 import {
   ServiceOrderAssignment,
   initServiceOrderAssignment,
@@ -28,7 +28,7 @@ const ServiceTypeModel = initServiceType(sequelize);
 const ServiceOrderModel = initServiceOrder(sequelize);
 const AttachmentModel = initAttachment(sequelize);
 const RecurringOrderModel = initRecurringOrder(sequelize);
-const ServiceOrderItemModel = initServiceOrderItem(sequelize);
+//const ServiceOrderItemModel = initServiceOrderItem(sequelize);
 const ServiceOrderAssignmentModel = initServiceOrderAssignment(sequelize);
 const ServiceOrderStatusHistoryModel = initServiceOrderStatusHistory(sequelize);
 const EmployeeServiceTypeModel = initEmployeeServiceType(sequelize);
@@ -45,12 +45,12 @@ ServiceTypeModel.hasMany(ServiceOrderModel, { foreignKey: 'service_type_id' });
 ServiceOrderModel.belongsTo(ServiceTypeModel, { foreignKey: 'service_type_id' });
 
 // Employee (lead) -> ServiceOrder (one-to-many)
-// NOTE: your ServiceOrder model uses `lead_employee_id` based on the model you shared earlier.
+// NOTE: your ServiceOrder model uses `employee_id` based on the model you shared earlier.
 // Use that column name so associations map correctly.
-EmployeeModel.hasMany(ServiceOrderModel, { foreignKey: 'lead_employee_id', as: 'leadOrders' });
+EmployeeModel.hasMany(ServiceOrderModel, { foreignKey: 'employee_id', as: 'leadOrders' });
 ServiceOrderModel.belongsTo(EmployeeModel, {
-  foreignKey: 'lead_employee_id',
-  as: 'leadEmployee',
+  foreignKey: 'employee_id',
+  as: 'Employee',
 });
 
 // ServiceOrder -> Attachment (one-to-many)
@@ -79,12 +79,12 @@ EmployeeServiceTypeModel.belongsTo(ServiceTypeModel, { foreignKey: 'service_type
 EmployeeModel.hasMany(EmployeeServiceTypeModel, { foreignKey: 'employee_id' });
 ServiceTypeModel.hasMany(EmployeeServiceTypeModel, { foreignKey: 'service_type_id' });
 
-// ServiceOrder -> ServiceOrderItem -> ServiceType
-ServiceOrderModel.hasMany(ServiceOrderItemModel, { foreignKey: 'order_id' });
-ServiceOrderItemModel.belongsTo(ServiceOrderModel, { foreignKey: 'order_id' });
+// // ServiceOrder -> ServiceOrderItem -> ServiceType
+// ServiceOrderModel.hasMany(ServiceOrderItemModel, { foreignKey: 'order_id' });
+// ServiceOrderItemModel.belongsTo(ServiceOrderModel, { foreignKey: 'order_id' });
 
-ServiceTypeModel.hasMany(ServiceOrderItemModel, { foreignKey: 'service_type_id' });
-ServiceOrderItemModel.belongsTo(ServiceTypeModel, { foreignKey: 'service_type_id' });
+// ServiceTypeModel.hasMany(ServiceOrderItemModel, { foreignKey: 'service_type_id' });
+// ServiceOrderItemModel.belongsTo(ServiceTypeModel, { foreignKey: 'service_type_id' });
 
 // ServiceOrder -> ServiceOrderAssignment -> Employee (many-to-many via assignment model)
 // NOTE: your ServiceOrderAssignment model uses `employee_id` (plural) in the model you provided earlier.
@@ -127,7 +127,7 @@ export interface DB {
   ServiceOrder: typeof ServiceOrder;
   Attachment: typeof Attachment;
   RecurringOrder: typeof RecurringOrder;
-  ServiceOrderItem: typeof ServiceOrderItem;
+//  ServiceOrderItem: typeof ServiceOrderItem;
   ServiceOrderAssignment: typeof ServiceOrderAssignment;
   ServiceOrderStatusHistory: typeof ServiceOrderStatusHistory;
   EmployeeServiceType: typeof EmployeeServiceType;
@@ -143,7 +143,7 @@ const db: DB = {
   ServiceOrder: ServiceOrderModel,
   Attachment: AttachmentModel,
   RecurringOrder: RecurringOrderModel,
-  ServiceOrderItem: ServiceOrderItemModel,
+//  ServiceOrderItem: ServiceOrderItemModel,
   ServiceOrderAssignment: ServiceOrderAssignmentModel,
   ServiceOrderStatusHistory: ServiceOrderStatusHistoryModel,
   EmployeeServiceType: EmployeeServiceTypeModel,

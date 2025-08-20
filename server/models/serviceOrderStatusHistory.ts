@@ -1,6 +1,5 @@
-import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
-
-// 1. Define attributes interface
+import { DataTypes, Model, Sequelize } from 'sequelize';
+import type { Optional } from 'sequelize';
 interface ServiceOrderStatusHistoryAttributes {
   history_id: number;
   order_id: number;
@@ -11,14 +10,12 @@ interface ServiceOrderStatusHistoryAttributes {
   comment?: string;
 }
 
-// 2. Define creation attributes
 interface ServiceOrderStatusHistoryCreationAttributes
   extends Optional<
     ServiceOrderStatusHistoryAttributes,
     'history_id' | 'old_status' | 'changed_at' | 'changed_by' | 'comment'
   > {}
 
-// 3. Define model class
 class ServiceOrderStatusHistory
   extends Model<ServiceOrderStatusHistoryAttributes, ServiceOrderStatusHistoryCreationAttributes>
   implements ServiceOrderStatusHistoryAttributes {
@@ -31,7 +28,6 @@ class ServiceOrderStatusHistory
   public comment?: string;
 }
 
-// 4. Init function
 function initServiceOrderStatusHistory(sequelize: Sequelize): typeof ServiceOrderStatusHistory {
   ServiceOrderStatusHistory.init(
     {
@@ -69,14 +65,14 @@ function initServiceOrderStatusHistory(sequelize: Sequelize): typeof ServiceOrde
       sequelize,
       tableName: 'service_order_status_history',
       timestamps: false,
+      underscored: true,
     }
   );
 
   return ServiceOrderStatusHistory;
 }
 
-//module.exports = initServiceOrderStatusHistory;
-export {ServiceOrderStatusHistory, initServiceOrderStatusHistory};
+export { ServiceOrderStatusHistory, initServiceOrderStatusHistory };
 export type {
   ServiceOrderStatusHistoryAttributes,
   ServiceOrderStatusHistoryCreationAttributes,

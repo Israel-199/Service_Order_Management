@@ -1,5 +1,5 @@
-import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
-
+import { DataTypes, Model, Sequelize } from 'sequelize';
+import type { Optional } from 'sequelize';
 // 1. Define attribute interface
 interface ServiceOrderItemAttributes {
   item_id: number;
@@ -56,8 +56,9 @@ function initServiceOrderItem(sequelize: Sequelize): typeof ServiceOrderItem {
     },
     {
       sequelize,
-      tableName: 'service_order_items',
-      timestamps: false,
+      tableName: 'service_orders',
+      timestamps: false,   // we manage created_at/updated_at manually
+      underscored: true,   // map camelCase <-> snake_case columns
     }
   );
 

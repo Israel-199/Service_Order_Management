@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Error</title>
+</head>
+<body>
+<pre>Cannot GET /api/service-orders/attachments/12/downloadt:3000/api/service-orders/attachments/12/download</pre>
+</body>
+</html>

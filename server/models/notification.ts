@@ -1,7 +1,6 @@
-import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
-
-// 1. Define attributes interface
-interface NotificationAttributes {
+import { DataTypes, Model, Sequelize } from 'sequelize';
+import type { Optional } from 'sequelize';
+export interface NotificationAttributes {
   notification_id: number;
   service_order_id?: number | null;
   type: 'new_order' | 'completed' | 'assigned' | 'overdue';
@@ -10,10 +9,8 @@ interface NotificationAttributes {
   created_at?: Date;
 }
 
-// 2. Define creation attributes (optional fields on create)
-interface NotificationCreationAttributes extends Optional<NotificationAttributes, 'notification_id' | 'service_order_id' | 'read' | 'created_at'> {}
+export interface NotificationCreationAttributes extends Optional<NotificationAttributes, 'notification_id' | 'service_order_id' | 'read' | 'created_at'> {}
 
-// 3. Define model class
 export class Notification extends Model<NotificationAttributes, NotificationCreationAttributes> implements NotificationAttributes {
   public notification_id!: number;
   public service_order_id?: number | null;
@@ -23,7 +20,6 @@ export class Notification extends Model<NotificationAttributes, NotificationCrea
   public created_at?: Date;
 }
 
-// 4. Init function to initialize the model
 export function initNotification(sequelize: Sequelize): typeof Notification {
   Notification.init(
     {
@@ -57,11 +53,9 @@ export function initNotification(sequelize: Sequelize): typeof Notification {
       sequelize,
       tableName: 'notifications',
       timestamps: false,
+      underscored: true,
     }
   );
 
   return Notification;
 }
-
-export type { NotificationAttributes, NotificationCreationAttributes };
-export default initNotification;

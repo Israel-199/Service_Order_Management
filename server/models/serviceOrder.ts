@@ -1,7 +1,7 @@
-import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
-
+import { DataTypes, Model, Sequelize } from 'sequelize';
+import type { Optional } from 'sequelize';
 // 1. Define attributes interface
-interface ServiceOrderAttributes {
+export interface ServiceOrderAttributes {
   order_id: number;
   customer_id: number;
   service_type_id: number;
@@ -19,7 +19,7 @@ interface ServiceOrderAttributes {
 }
 
 // 2. Define creation attributes
-interface ServiceOrderCreationAttributes
+export interface ServiceOrderCreationAttributes
   extends Optional<
     ServiceOrderAttributes,
     | 'order_id'
@@ -36,10 +36,10 @@ interface ServiceOrderCreationAttributes
   > {}
 
 // 3. Define the model class, adding association properties
-class ServiceOrder
+export class ServiceOrder
   extends Model<ServiceOrderAttributes, ServiceOrderCreationAttributes>
-  implements ServiceOrderAttributes
-{
+  implements ServiceOrderAttributes 
+  {
   public order_id!: number;
   public customer_id!: number;
   public service_type_id!: number;
@@ -55,17 +55,14 @@ class ServiceOrder
   public updated_at?: Date;
   public due_date?: Date;
 
-  // Association properties (added to resolve TS errors)
+  // optional association placeholders (helpful for TS)
   public ServiceType?: { name?: string } | null;
   public Customer?: { name?: string; email?: string } | null;
   public Attachments?: Array<{ file_path: string; file_type: string }> | null;
-  public ServiceOrderAssignments?: Array<{ 
-    Employee?: { name?: string; email?: string } 
-  }> | null;
+  public ServiceOrderAssignments?: Array<{ Employee?: { name?: string; email?: string } }> | null;
 }
 
-// 4. Export an init function that takes sequelize and DataTypes
-function initServiceOrder(sequelize: Sequelize): typeof ServiceOrder {
+export function initServiceOrder(sequelize: Sequelize): typeof ServiceOrder {
   ServiceOrder.init(
     {
       order_id: {
@@ -91,6 +88,7 @@ function initServiceOrder(sequelize: Sequelize): typeof ServiceOrder {
       },
       status: {
         type: DataTypes.ENUM('new', 'assigned', 'in_progress', 'completed', 'closed'),
+        allowNull: false,
         defaultValue: 'new',
       },
       employee_id: {
@@ -115,11 +113,13 @@ function initServiceOrder(sequelize: Sequelize): typeof ServiceOrder {
       },
       created_at: {
         type: DataTypes.DATE,
+        allowNull: false,
         defaultValue: DataTypes.NOW,
       },
+      // updated_at: managed by application logic; do not auto-default so updates are explicit
       updated_at: {
         type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW,
+        allowNull: true,
       },
       due_date: {
         type: DataTypes.DATE,
@@ -129,12 +129,10 @@ function initServiceOrder(sequelize: Sequelize): typeof ServiceOrder {
     {
       sequelize,
       tableName: 'service_orders',
-      timestamps: false,
+      timestamps: false,   // we manage created_at/updated_at manually
+      underscored: true,   // map camelCase <-> snake_case columns
     }
   );
 
   return ServiceOrder;
 }
-
-export { ServiceOrder, initServiceOrder };
-export type { ServiceOrderAttributes, ServiceOrderCreationAttributes };

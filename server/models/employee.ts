@@ -1,5 +1,5 @@
-// models/employee.ts
-import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
+import { DataTypes, Model, Sequelize } from 'sequelize';
+import type { Optional } from 'sequelize';
 
 export interface EmployeeAttributes {
   employee_id: number;
@@ -62,6 +62,7 @@ export function initEmployee(sequelize: Sequelize): typeof Employee {
       sequelize,
       tableName: 'employees',
       timestamps: false,
+      underscored: true,
     }
   );
 

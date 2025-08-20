@@ -1,26 +1,22 @@
 import { DataTypes, Model, Sequelize } from 'sequelize';
 
-// 1. Define model attributes interface
 interface EmployeeServiceTypeAttributes {
   employee_id: number;
   service_type_id: number;
-  createdAt?: Date;
-  updatedAt?: Date;
+  created_at?: Date;
+  updated_at?: Date;
 }
 
-// 2. Creation attributes (all required except timestamps)
-interface EmployeeServiceTypeCreationAttributes extends Partial<Pick<EmployeeServiceTypeAttributes, 'createdAt' | 'updatedAt'>> {}
+interface EmployeeServiceTypeCreationAttributes extends Partial<Pick<EmployeeServiceTypeAttributes, 'created_at' | 'updated_at'>> {}
 
-// 3. Define the model class
 export class EmployeeServiceType extends Model<EmployeeServiceTypeAttributes, EmployeeServiceTypeCreationAttributes>
   implements EmployeeServiceTypeAttributes {
   public employee_id!: number;
   public service_type_id!: number;
-  public createdAt?: Date;
-  public updatedAt?: Date;
+  public created_at?: Date;
+  public updated_at?: Date;
 }
 
-// 4. Init function for model
 export function initEmployeeServiceType(sequelize: Sequelize): typeof EmployeeServiceType {
   EmployeeServiceType.init(
     {
@@ -34,21 +30,13 @@ export function initEmployeeServiceType(sequelize: Sequelize): typeof EmployeeSe
         primaryKey: true,
         allowNull: false,
       },
-      createdAt: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: DataTypes.NOW,
-      },
-      updatedAt: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: DataTypes.NOW,
-      },
+      // Let Sequelize manage timestamps (created_at, updated_at) via timestamps: true + underscored: true
     },
     {
       sequelize,
       tableName: 'employee_service_types',
       timestamps: true,
+      underscored: true,
     }
   );
 

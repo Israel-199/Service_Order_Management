@@ -1,6 +1,6 @@
 // services/dashboardService.ts
-import { db } from "../models";
 import { Op, Sequelize } from "sequelize";
+import { db } from "../models";
 
 const {
   ServiceOrder,
@@ -20,11 +20,17 @@ interface RecentOrder {
   priority?: string;
   createdAt?: Date | null;
   assignedEmployees: { name?: string | null; email?: string | null }[];
-  attachments: { file_path?: string | null; file_type?: string | null }[];
+  attachments: {
+    attachment_id?: number;
+    original_name?: string | null;
+    file_path?: string | null;
+    file_type?: string | null;
+    download_url?: string;
+  }[];
 }
 
 interface TechnicianEfficiency {
-  employees_id: number;
+  employee_id: number;
   employee_name: string | null;
   assigned_orders: number;
   completed_orders: number;
@@ -32,7 +38,7 @@ interface TechnicianEfficiency {
 }
 
 interface TopPerformer {
-  employees_id: number;
+  employee_id: number;
   employee_name: string | null;
   efficiency_percentage: number;
 }
@@ -51,6 +57,12 @@ interface MonthlyTrend {
   month: string;
   total: number;
   completionRate: number;
+}
+
+interface TopAttachedOrder {
+  orderId: number;
+  attachmentCount: number;
+  serviceTypeName?: string | null;
 }
 
 class DashboardService {
@@ -76,7 +88,7 @@ class DashboardService {
     // 4) Active technicians (distinct employees assigned to non-final orders)
     const activeTechnicians = await ServiceOrderAssignment.count({
       distinct: true,
-      col: "employees_id",
+      col: "employee_id",
       include: [
         {
           model: ServiceOrder,
@@ -86,7 +98,7 @@ class DashboardService {
       ],
     });
 
-    // 5) Recent service orders
+    // 5) Recent service orders (with attachments)
     const cutoff = new Date();
     cutoff.setDate(cutoff.getDate() - recentDays);
 
@@ -99,14 +111,18 @@ class DashboardService {
           model: ServiceOrderAssignment,
           include: [{ model: Employee, attributes: ["name", "email"] }],
         },
-        { model: Attachment, attributes: ["file_path", "file_type"] },
+        // include attachments with full metadata
+        {
+          model: Attachment,
+          attributes: ["attachment_id", "original_name", "file_path", "file_type"],
+        },
       ],
       attributes: ["order_id", "status", "priority", "created_at"],
       order: [["created_at", "DESC"]],
       limit: 10,
     });
 
-    const recent: RecentOrder[] = recentOrders.map((o: any) => ({
+    const recent: RecentOrder[] = (recentOrders as any[]).map((o: any) => ({
       orderId: o.order_id,
       serviceTypeName: o.ServiceType?.name ?? null,
       customerName: o.Customer?.name ?? null,
@@ -118,12 +134,17 @@ class DashboardService {
         (o.ServiceOrderAssignments ?? []).map((a: any) => ({
           name: a.Employee?.name ?? null,
           email: a.Employee?.email ?? null,
-        })) || [],
+        })) ?? [],
       attachments:
         (o.Attachments ?? []).map((a: any) => ({
+          attachment_id: a.attachment_id,
+          original_name: a.original_name ?? null,
           file_path: a.file_path ?? null,
           file_type: a.file_type ?? null,
-        })) || [],
+          download_url: a.attachment_id
+            ? `http://localhost:3000/api/service-orders/attachments/${a.attachment_id}/download`
+            : undefined,
+        })) ?? [],
     }));
 
     return {
@@ -134,8 +155,8 @@ class DashboardService {
       recentOrders: recent,
     };
   }
-//  async getAnalyticData(p0?: { recentDays: number; }) {
-async getAnalyticData() {
+
+  async getAnalyticData() {
     // 1) Total + Completed + Rate
     const totalOrders = await ServiceOrder.count();
     const completedOrders = await ServiceOrder.count({
@@ -159,9 +180,10 @@ async getAnalyticData() {
       completedRows.length > 0 ? parseFloat((totalDays / completedRows.length).toFixed(2)) : 0;
 
     // 3) Technician efficiency data (raw)
+    // Use quoted alias in CASE literal so Postgres recognizes the joined alias.
     const effRows: any[] = await ServiceOrderAssignment.findAll({
       attributes: [
-        "employees_id",
+        "employee_id",
         [Sequelize.col("Employee.name"), "employee_name"],
         [
           Sequelize.fn(
@@ -173,16 +195,16 @@ async getAnalyticData() {
         [
           Sequelize.fn(
             "SUM",
-            Sequelize.literal(`CASE WHEN ServiceOrder.status='completed' THEN 1 ELSE 0 END`)
+            Sequelize.literal(`CASE WHEN "ServiceOrder"."status" = 'completed' THEN 1 ELSE 0 END`)
           ),
           "completed_count",
         ],
       ],
       include: [
-        { model: ServiceOrder, attributes: [] },
+        { model: ServiceOrder, attributes: [] }, // ensure "ServiceOrder" alias exists
         { model: Employee, attributes: [] },
       ],
-      group: ["ServiceOrderAssignment.employees_id", "Employee.name"],
+      group: ["ServiceOrderAssignment.employee_id", "Employee.name"],
       raw: true,
     });
 
@@ -190,7 +212,7 @@ async getAnalyticData() {
       const assigned = Number(r.assigned_count) || 0;
       const completed = Number(r.completed_count) || 0;
       return {
-        employees_id: Number(r.employees_id) || 0,
+        employee_id: Number(r.employee_id) || 0,
         employee_name: r.employee_name ?? null,
         assigned_orders: assigned,
         completed_orders: completed,
@@ -198,9 +220,9 @@ async getAnalyticData() {
       };
     });
 
-    // 4) Top performer (provide a safe typed initial accumulator)
+    // 4) Top performer (safe initial accumulator)
     const topInitial: TopPerformer = {
-      employees_id: 0,
+      employee_id: 0,
       employee_name: null,
       efficiency_percentage: 0,
     };
@@ -243,26 +265,67 @@ async getAnalyticData() {
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5);
     sixMonthsAgo.setDate(1);
 
+    // Use TO_CHAR for Postgres; if you run MySQL you'll want to change this back to DATE_FORMAT
     const trendRows: any[] = await ServiceOrder.findAll({
       attributes: [
-        [Sequelize.fn("DATE_FORMAT", Sequelize.col("created_at"), "%Y-%m"), "month"],
+        [Sequelize.fn("TO_CHAR", Sequelize.col("created_at"), "YYYY-MM"), "month"],
         [Sequelize.fn("COUNT", Sequelize.col("order_id")), "total"],
         [
-          Sequelize.fn("SUM", Sequelize.literal(`CASE WHEN status='completed' THEN 1 ELSE 0 END`)),
+          Sequelize.fn("SUM", Sequelize.literal(`CASE WHEN "ServiceOrder"."status" = 'completed' THEN 1 ELSE 0 END`)),
           "completed",
         ],
       ],
       where: { created_at: { [Op.gte]: sixMonthsAgo } },
       group: ["month"],
-      order: [["month", "ASC"]],
+      order: [[Sequelize.literal("month"), "ASC"]],
       raw: true,
     });
 
     const monthlyTrends: MonthlyTrend[] = trendRows.map((r: any) => ({
       month: r.month,
       total: Number(r.total) || 0,
-      completionRate: r.total ? parseFloat(((Number(r.completed) / Number(r.total)) * 100).toFixed(2)) : 0,
+      completionRate:
+        r.total && Number(r.total) > 0 ? parseFloat(((Number(r.completed) / Number(r.total)) * 100).toFixed(2)) : 0,
     }));
+
+    // --- Attachment analytics additions ---
+
+    // total attachments across all orders
+    const totalAttachments = await Attachment.count();
+
+    // top attached orders (order_id + count) - get top 5 order_ids by attachment count
+    const topAttachedAgg: any[] = await Attachment.findAll({
+      attributes: [
+        "order_id",
+        [Sequelize.fn("COUNT", Sequelize.col("attachment_id")), "attachment_count"],
+      ],
+      group: ["order_id"],
+      order: [[Sequelize.literal("attachment_count"), "DESC"]],
+      limit: 5,
+      raw: true,
+    });
+
+    // fetch service type (name) for those orders to make the response nicer
+    const topOrderIds = topAttachedAgg.map((r) => Number(r.order_id));
+    let topAttachedOrders: TopAttachedOrder[] = [];
+    if (topOrderIds.length > 0) {
+      const ordersInfo = await ServiceOrder.findAll({
+        where: { order_id: { [Op.in]: topOrderIds } },
+        include: [{ model: ServiceType, attributes: ["name"] }],
+        attributes: ["order_id", "service_type_id"],
+      });
+
+      const infoById: Record<number, any> = {};
+      for (const o of ordersInfo as any[]) {
+        infoById[o.order_id] = { serviceTypeName: o.ServiceType?.name ?? null };
+      }
+
+      topAttachedOrders = topAttachedAgg.map((r) => ({
+        orderId: Number(r.order_id),
+        attachmentCount: Number(r.attachment_count) || 0,
+        serviceTypeName: infoById[Number(r.order_id)]?.serviceTypeName ?? null,
+      }));
+    }
 
     return {
       totalOrders,
@@ -274,6 +337,9 @@ async getAnalyticData() {
       technicianEfficiency,
       statusPercentages,
       monthlyTrends,
+      // new attachment-related analytics
+      totalAttachments,
+      topAttachedOrders,
     };
   }
 }

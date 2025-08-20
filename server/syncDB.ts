@@ -5,7 +5,7 @@
  * In production: use migrations instead (sequelize-cli).
  */
 
-
+// npx ts-node syncDB.ts
 
 import { sequelize } from './models';
 

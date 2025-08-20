@@ -1,5 +1,5 @@
-// models/customer.ts
-import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
+import { DataTypes, Model, Sequelize } from 'sequelize';
+import type { Optional } from 'sequelize';
 
 export interface CustomerAttributes {
   customer_id: number;
@@ -61,6 +61,7 @@ export function initCustomer(sequelize: Sequelize): typeof Customer {
       sequelize,
       tableName: 'customers',
       timestamps: false,
+      underscored: true,
     }
   );
 
