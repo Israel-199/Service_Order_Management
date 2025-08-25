@@ -6,7 +6,7 @@ A web-based Service Order Lifecycle Management System for efficiently handling s
 
 - **Frontend:** React v19.1.0
 - **Backend:** Node.js v22.17.1
-- **Database:** MySQL 8.0.34
+- **Database:** PostgreSQL 17.6
 - **Folder Structure:**
 ├── client # React frontend
 ├── server # Node.js backend (API logic, controllers)
