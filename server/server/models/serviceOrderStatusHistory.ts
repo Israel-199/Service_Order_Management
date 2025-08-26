@@ -1,0 +1,79 @@
+import { DataTypes, Model, Sequelize } from 'sequelize';
+import type { Optional } from 'sequelize';
+interface ServiceOrderStatusHistoryAttributes {
+  history_id: number;
+  order_id: number;
+  old_status?: 'new' | 'assigned' | 'in_progress' | 'completed' | 'closed' | null;
+  new_status: 'new' | 'assigned' | 'in_progress' | 'completed' | 'closed';
+  changed_at?: Date;
+  changed_by?: number | null;
+  comment?: string;
+}
+
+interface ServiceOrderStatusHistoryCreationAttributes
+  extends Optional<
+    ServiceOrderStatusHistoryAttributes,
+    'history_id' | 'old_status' | 'changed_at' | 'changed_by' | 'comment'
+  > {}
+
+class ServiceOrderStatusHistory
+  extends Model<ServiceOrderStatusHistoryAttributes, ServiceOrderStatusHistoryCreationAttributes>
+  implements ServiceOrderStatusHistoryAttributes {
+  public history_id!: number;
+  public order_id!: number;
+  public old_status?: 'new' | 'assigned' | 'in_progress' | 'completed' | 'closed' | null;
+  public new_status!: 'new' | 'assigned' | 'in_progress' | 'completed' | 'closed';
+  public changed_at?: Date;
+  public changed_by?: number | null;
+  public comment?: string;
+}
+
+function initServiceOrderStatusHistory(sequelize: Sequelize): typeof ServiceOrderStatusHistory {
+  ServiceOrderStatusHistory.init(
+    {
+      history_id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
+      order_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      old_status: {
+        type: DataTypes.ENUM('new', 'assigned', 'in_progress', 'completed', 'closed'),
+        allowNull: true,
+      },
+      new_status: {
+        type: DataTypes.ENUM('new', 'assigned', 'in_progress', 'completed', 'closed'),
+        allowNull: false,
+      },
+      changed_at: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
+      },
+      changed_by: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+      comment: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+    },
+    {
+      sequelize,
+      tableName: 'service_order_status_history',
+      timestamps: false,
+      underscored: true,
+    }
+  );
+
+  return ServiceOrderStatusHistory;
+}
+
+export { ServiceOrderStatusHistory, initServiceOrderStatusHistory };
+export type {
+  ServiceOrderStatusHistoryAttributes,
+  ServiceOrderStatusHistoryCreationAttributes,
+};
