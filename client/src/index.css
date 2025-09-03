@@ -1,0 +1,125 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(20, 14.3%, 4.1%);
+  --muted: hsl(60, 4.8%, 95.9%);
+  --muted-foreground: hsl(25, 5.3%, 44.7%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(20, 14.3%, 4.1%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(20, 14.3%, 4.1%);
+  --border: hsl(20, 5.9%, 90%);
+  --input: hsl(20, 5.9%, 90%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(211, 100%, 99%);
+  --secondary: hsl(60, 4.8%, 95.9%);
+  --secondary-foreground: hsl(24, 9.8%, 10%);
+  --accent: hsl(60, 4.8%, 95.9%);
+  --accent-foreground: hsl(24, 9.8%, 10%);
+  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive-foreground: hsl(60, 9.1%, 97.8%);
+  --ring: hsl(20, 14.3%, 4.1%);
+  --radius: 0.5rem;
+  
+  /* TechFlow specific colors */
+  --techflow-primary: hsl(207, 90%, 54%);
+  --techflow-secondary: hsl(123, 46%, 39%);
+  --techflow-accent: hsl(14, 100%, 55%);
+  --techflow-surface: hsl(0, 0%, 98%);
+  --techflow-text-primary: hsl(0, 0%, 13%);
+  --techflow-text-secondary: hsl(0, 0%, 46%);
+  --techflow-status-new: hsl(0, 0%, 62%);
+  --techflow-status-assigned: hsl(207, 90%, 54%);
+  --techflow-status-progress: hsl(36, 100%, 50%);
+  --techflow-status-completed: hsl(123, 46%, 47%);
+  --techflow-status-closed: hsl(200, 18%, 46%);
+  --techflow-priority-normal: hsl(123, 46%, 47%);
+  --techflow-priority-urgent: hsl(36, 100%, 50%);
+  --techflow-priority-high: hsl(4, 90%, 58%);
+}
+
+.dark {
+  --background: hsl(240, 10%, 3.9%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(240, 3.7%, 15.9%);
+  --muted-foreground: hsl(240, 5%, 64.9%);
+  --popover: hsl(240, 10%, 3.9%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(240, 10%, 3.9%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(240, 3.7%, 15.9%);
+  --input: hsl(240, 3.7%, 15.9%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(211, 100%, 99%);
+  --secondary: hsl(240, 3.7%, 15.9%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(240, 3.7%, 15.9%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(240, 4.9%, 83.9%);
+  --radius: 0.5rem;
+  /* Improve TechFlow tokens for dark mode contrast */
+  --techflow-text-primary: hsl(0, 0%, 92%);
+  --techflow-text-secondary: hsl(0, 0%, 70%);
+  --techflow-surface: hsl(240, 8%, 12%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .techflow-primary {
+    background-color: var(--techflow-primary);
+  }
+  
+  .techflow-secondary {
+    background-color: var(--techflow-secondary);
+  }
+  
+  .techflow-accent {
+    background-color: var(--techflow-accent);
+  }
+  
+  .techflow-surface {
+    background-color: var(--techflow-surface);
+  }
+  
+  .text-techflow-primary {
+    color: var(--techflow-text-primary);
+  }
+  
+  .text-techflow-secondary {
+    color: var(--techflow-text-secondary);
+  }
+  
+  .status-new {
+    background-color: var(--techflow-status-new);
+  }
+  
+  .status-assigned {
+    background-color: var(--techflow-status-assigned);
+  }
+  
+  .status-progress {
+    background-color: var(--techflow-status-progress);
+  }
+  
+  .status-completed {
+    background-color: var(--techflow-status-completed);
+  }
+  
+  .status-closed {
+    background-color: var(--techflow-status-closed);
+  }
+}

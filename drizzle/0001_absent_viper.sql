@@ -1,0 +1,1 @@
+ALTER TABLE "invoices" ALTER COLUMN "service_order_id" SET DATA TYPE text;
