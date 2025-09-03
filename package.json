@@ -3,16 +3,15 @@
   "version": "1.0.0",
   "type": "module",
   "license": "MIT",
-  "scripts": {
-    "dev": "cross-env NODE_ENV=development tsx server/index.ts",
-    "check": "tsc",
-    "db:push": "drizzle-kit push",
-    "start": "tsx index.ts",
-    "build": "echo 'no build needed'"
-  },
+ "scripts": {
+  "dev": "cross-env NODE_ENV=development tsx server/index.ts",
+  "build": "tsc",
+  "start": "node dist/server/index.js",
+  "check": "tsc",
+  "db:push": "drizzle-kit push"
+},
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
-    "cross-env": "^10.0.0",
     "@jridgewell/trace-mapping": "^0.3.25",
     "@neondatabase/serverless": "^0.10.4",
     "@radix-ui/react-accordion": "^1.2.4",
@@ -46,6 +45,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "connect-pg-simple": "^10.0.0",
+    "cross-env": "^10.0.0",
     "date-fns": "^3.6.0",
     "docx": "^9.5.1",
     "dotenv": "^17.2.1",
