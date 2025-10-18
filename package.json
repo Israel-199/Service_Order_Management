@@ -3,10 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-  "build:frontend": "npx vite build --config vite.config.ts",
-  "build:backend": "cd server && npm run build",
-  "build": "npm run build:backend && npm run build:frontend",
-  "dev": "concurrently \"cd server && npm run dev\" \"npx vite --config vite.config.ts\""
+  "install:frontend": "npm install --prefix client",
+  "build:frontend": "npm run build --prefix client",
+  "build": "npm run build:backend && npm run build:frontend"
 },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
