@@ -2,10 +2,12 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "dist",
-    "rootDir": "server",
+    "rootDir": "server",       // your backend source folder
     "module": "ES2022",
     "target": "ES2022",
-    "noEmit": false
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true
   },
   "include": ["server/**/*"]
 }
