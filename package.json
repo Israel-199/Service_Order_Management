@@ -3,9 +3,11 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "postinstall": "cd server && npm install && cd ../client && npm install",
-    "build": "cd server && npm run build && cd ../client && npm run build",
-    "dev": "concurrently \"cd server && npm run dev\" \"cd client && npm run dev\""
+    "install": "cd server && npm install",
+    "build:backend": "cd server && npm run build",
+    "build:frontend": "npx vite build --config client/vite.config.ts",
+    "build": "npm run build:backend && npm run build:frontend",
+    "dev": "concurrently \"cd server && npm run dev\" \"cd client && npx vite\""
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
