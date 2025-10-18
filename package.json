@@ -1,14 +1,10 @@
 {
-  "name": "my-notes-root",
+  "name": "service-order-management-system",
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "install:backend": "cd server && npm install",
-    "install:frontend": "cd client && npm install",
-    "preinstall": "npm run install:backend && npm run install:frontend",
-    "build:backend": "cd server && npm run build",
-    "build:frontend": "cd client && npm run build",
-    "build": "npm run build:backend && npm run build:frontend",
+    "install": "cd server && npm install && cd ../client && npm install",
+    "build": "cd server && npm run build && cd ../client && npm run build",
     "dev": "concurrently \"cd server && npm run dev\" \"cd client && npm run dev\""
   },
   "dependencies": {
