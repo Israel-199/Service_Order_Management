@@ -3,12 +3,11 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "install": "cd server && npm install",
-    "build:backend": "cd server && npm run build",
-    "build:frontend": "npx vite build --config client/vite.config.ts",
-    "build": "npm run build:backend && npm run build:frontend",
-    "dev": "concurrently \"cd server && npm run dev\" \"cd client && npx vite\""
-  },
+  "build:frontend": "npx vite build --config vite.config.ts",
+  "build:backend": "cd server && npm run build",
+  "build": "npm run build:backend && npm run build:frontend",
+  "dev": "concurrently \"cd server && npm run dev\" \"npx vite --config vite.config.ts\""
+},
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
     "@neondatabase/serverless": "^0.10.4",
