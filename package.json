@@ -3,9 +3,16 @@
   "version": "1.0.0",
   "private": true,
  "scripts": {
-  "install": "cd server && npm install && cd ../client && npm install",
-  "build": "cd server && npm run build && cd ../client && npm run build",
-  "start": "cd server && npm start"
+  "install:backend": "cd server && npm install",
+  "install:frontend": "cd client && npm install",
+  "install": "npm run install:backend && npm run install:frontend",
+  
+  "build:backend": "cd server && npm run build",
+  "build:frontend": "cd client && npm run build",
+  "build": "npm run build:backend && npm run build:frontend",
+  
+  "start:backend": "cd server && npm start",
+  "start": "npm run start:backend"
 },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
