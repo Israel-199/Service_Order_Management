@@ -2,11 +2,11 @@
   "name": "my-notes-root",
   "version": "1.0.0",
   "private": true,
-  "scripts": {
-    "install": "cd Backend && npm install && cd ../Frontend && npm install",
-    "build": "cd Backend && npm run build && cd ../Frontend && npm run build",
-    "start": "cd Backend && npm run start"
-  },
+ "scripts": {
+  "install": "cd server && npm install && cd ../client && npm install",
+  "build": "cd server && npm run build && cd ../client && npm run build",
+  "start": "cd server && npm start"
+},
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
     "@jridgewell/trace-mapping": "^0.3.25",
