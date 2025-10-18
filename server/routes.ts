@@ -369,6 +369,94 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+
+// HTTPMethod	    Route	                    Functionality
+// GET	     /api/inventory/items	            List all items
+// GET	     /api/inventory/items/:id	        Get a specific item
+// POST	   /api/inventory/items	            Create a new item
+// PUT	     /api/inventory/items/:id	        Update an item
+// DELETE   /api/inventory/items/:id	        Delete an item
+
+
+// HTTPMethod	         Route	                     Functionality
+// GET	         /api/inventory/transactions	     List all inventory transactions
+//POST	     /api/inventory/transactions   Record a new transaction (IN, OUT, ADJUST) and automatically updates item quantity
+
+  // // Inventory Items
+app.get("/api/inventory/items", async (_req, res) => {
+  try {
+    const items = await storage.getInventoryItems();
+    res.json(items);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch inventory items" });
+  }
+});
+
+app.get("/api/inventory/items/:id", async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const item = await storage.getInventoryItem(id);
+    if (!item) return res.status(404).json({ message: "Inventory item not found" });
+    res.json(item);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch inventory item" });
+  }
+});
+
+app.post("/api/inventory/items", async (req, res) => {
+  try {
+    const itemData = req.body; // Ideally, validate with Zod schema
+    const item = await storage.createInventoryItem(itemData);
+    res.status(201).json(item);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to create inventory item" });
+  }
+});
+
+app.put("/api/inventory/items/:id", async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const data = req.body;
+    const updated = await storage.updateInventoryItem(id, data);
+    if (!updated) return res.status(404).json({ message: "Inventory item not found" });
+    res.json(updated);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to update inventory item" });
+  }
+});
+
+app.delete("/api/inventory/items/:id", async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const deleted = await storage.deleteInventoryItem(id);
+    if (!deleted) return res.status(404).json({ message: "Inventory item not found" });
+    res.status(204).send();
+  } catch (error) {
+    res.status(500).json({ message: "Failed to delete inventory item" });
+  }
+});
+
+// Inventory Transactions
+app.get("/api/inventory/transactions", async (_req, res) => {
+  try {
+    const transactions = await storage.getInventoryTransactions();
+    res.json(transactions);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch inventory transactions" });
+  }
+});
+
+app.post("/api/inventory/transactions", async (req, res) => {
+  try {
+    const data = req.body; // Validate with Zod schema if possible
+    const transaction = await storage.createInventoryTransaction(data);
+    res.status(201).json(transaction);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to create inventory transaction" });
+  }
+});
+
+
   const httpServer = createServer(app);
   return httpServer;
 }
