@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-  "install:frontend": "npm install --prefix client",
-  "build:frontend": "npm run build --prefix client",
-  "build": "npm run build:backend && npm run build:frontend"
-},
+    "install": "npm install --prefix client && npm install --prefix server",
+    "build": "npm run build --prefix client",
+    "dev": "concurrently \"npm run dev --prefix server\" \"npm run dev --prefix client\""
+  },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
     "@neondatabase/serverless": "^0.10.4",
