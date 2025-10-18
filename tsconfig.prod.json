@@ -8,7 +8,8 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "outDir": "dist",
-    "types": ["node", "vite/client"]
+    "types": ["node"]
   },
-  "include": ["Backend/src", "Frontend/src"]
+  "include": ["server/**/*"],
+  "exclude": ["dist", "client"]
 }
